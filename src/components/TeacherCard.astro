@@ -1,0 +1,27 @@
+---
+import type { Teacher } from "../data/teachers";
+
+interface Props {
+  teacher: Teacher;
+  featured?: boolean;
+}
+
+const { teacher, featured = false } = Astro.props;
+---
+
+<article class:list={["teacher-card", { "is-featured": featured }, "js-reveal"]}>
+  <a href={`/equipo/${teacher.slug}`} class="teacher-card-link" aria-label={`Ver ficha de ${teacher.name}`}>
+    <div
+      class="teacher-media reveal-mask"
+      style={`view-transition-name:teacher-image-${teacher.slug}`}
+    >
+      <img src={teacher.image} alt={teacher.alt} loading="lazy" decoding="async" />
+    </div>
+    <div class="teacher-body">
+      <p>{teacher.specialty}</p>
+      <h3 style={`view-transition-name:teacher-name-${teacher.slug}`}>{teacher.name}</h3>
+      <span>{teacher.role}</span>
+      <span class="text-link">Ficha <span aria-hidden="true">→</span></span>
+    </div>
+  </a>
+</article>

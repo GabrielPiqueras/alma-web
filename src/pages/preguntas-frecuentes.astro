@@ -1,0 +1,33 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CTA from "../components/CTA.astro";
+import { faqs, imageLibrary } from "../data/site";
+---
+
+<BaseLayout
+  title="Preguntas frecuentes"
+  description="Preguntas frecuentes demo sobre ALMA, formación, agencia y datos ficticios del proyecto."
+  image={imageLibrary.detail}
+>
+  <section class="page-hero compact-hero">
+    <div>
+      <p class="eyebrow">FAQ demo</p>
+      <h1 class="split-lines">
+        <span data-line>Preguntas frecuentes</span>
+      </h1>
+    </div>
+    <p>Contenido preparado para explicar límites, enfoque y estado demo del proyecto.</p>
+  </section>
+
+  <section class="section faq-list">
+    {faqs.map((faq, index) => (
+      <article class="faq-item js-reveal">
+        <span>{String(index + 1).padStart(2, "0")}</span>
+        <h2>{faq.question}</h2>
+        <p>{faq.answer}</p>
+      </article>
+    ))}
+  </section>
+
+  <CTA href="/contacto" label="Resolver una duda" dark />
+</BaseLayout>

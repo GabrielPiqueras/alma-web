@@ -1,0 +1,106 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CTA from "../../components/CTA.astro";
+import EditorialImage from "../../components/EditorialImage.astro";
+import SubjectCard from "../../components/SubjectCard.astro";
+import TeacherCard from "../../components/TeacherCard.astro";
+import { subjects, type Subject } from "../../data/subjects";
+import { teachers } from "../../data/teachers";
+
+export function getStaticPaths() {
+  return subjects.map((subject) => ({
+    params: { slug: subject.slug },
+    props: { subject }
+  }));
+}
+
+const { subject } = Astro.props as { subject: Subject };
+const subjectTeachers = teachers.filter((teacher) => subject.teacherSlugs.includes(teacher.slug));
+const relatedSubjects = subjects.filter((item) => item.slug !== subject.slug).slice(0, 3);
+---
+
+<BaseLayout
+  title={`${subject.title} — Formación`}
+  description={subject.summary}
+  image={subject.image}
+  jsonLd={[
+    {
+      "@context": "https://schema.org",
+      "@type": "Course",
+      name: subject.title,
+      description: subject.description,
+      provider: {
+        "@type": "EducationalOrganization",
+        name: "ALMA — Escuela & Agencia de Imagen"
+      }
+    }
+  ]}
+>
+  <section class="detail-hero">
+    <div class="detail-copy">
+      <p class="eyebrow">{subject.number} / Asignatura demo</p>
+      <h1 class="split-lines" style={`view-transition-name:subject-title-${subject.slug}`}>
+        <span data-line>{subject.title}</span>
+      </h1>
+      <p>{subject.description}</p>
+      <div class="detail-meta">
+        <span>{subject.kicker}</span>
+        <span>{subject.duration}</span>
+      </div>
+    </div>
+    <EditorialImage
+      src={subject.image}
+      alt={subject.alt}
+      ratio="portrait"
+      transitionName={`subject-image-${subject.slug}`}
+      eager
+      parallax
+    />
+  </section>
+
+  <section class="section detail-grid">
+    <div class="detail-panel js-reveal">
+      <p class="eyebrow">Objetivos</p>
+      <ul class="check-list">
+        {subject.objectives.map((objective) => <li>{objective}</li>)}
+      </ul>
+    </div>
+    <div class="detail-panel js-reveal">
+      <p class="eyebrow">Contenidos</p>
+      <ul class="check-list">
+        {subject.syllabus.map((item) => <li>{item}</li>)}
+      </ul>
+    </div>
+    <div class="detail-panel is-wide js-reveal">
+      <p class="eyebrow">Metodología</p>
+      <p>{subject.methodology}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-inline-heading">
+      <p class="eyebrow">Profesorado responsable</p>
+      <h2>Relación directa con equipo docente.</h2>
+    </div>
+    <div class="teacher-grid compact">
+      {subjectTeachers.map((teacher) => <TeacherCard teacher={teacher} />)}
+    </div>
+  </section>
+
+  <section class="section related-section">
+    <div class="section-inline-heading">
+      <p class="eyebrow">También dentro del programa</p>
+      <h2>Asignaturas relacionadas</h2>
+    </div>
+    <div class="subjects-grid is-related">
+      {relatedSubjects.map((item) => <SubjectCard subject={item} compact />)}
+    </div>
+  </section>
+
+  <CTA
+    title="Ver el programa completo."
+    text="Todas las asignaturas están conectadas para construir presencia, criterio y material profesional."
+    href="/formacion"
+    label="Volver a formación"
+  />
+</BaseLayout>

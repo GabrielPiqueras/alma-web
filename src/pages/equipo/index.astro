@@ -1,0 +1,70 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CTA from "../../components/CTA.astro";
+import EditorialImage from "../../components/EditorialImage.astro";
+import SectionHeading from "../../components/SectionHeading.astro";
+import TeacherCard from "../../components/TeacherCard.astro";
+import { teachers } from "../../data/teachers";
+import { founder, imageLibrary } from "../../data/site";
+
+const founderProfile = teachers.find((teacher) => teacher.isFounder);
+const teachingTeam = teachers.filter((teacher) => !teacher.isFounder);
+---
+
+<BaseLayout
+  title="Profesores y dirección"
+  description="Equipo docente demo de ALMA con dirección, perfiles profesionales y fichas individuales enlazadas a asignaturas."
+  image={imageLibrary.founder}
+>
+  <section class="page-hero">
+    <div>
+      <p class="eyebrow">Equipo / Dirección</p>
+      <h1 class="split-lines">
+        <span data-line>Una escuela se reconoce</span>
+        <span data-line>por quién corrige, acompaña y mira.</span>
+      </h1>
+    </div>
+    <p>
+      El equipo docente demo reúne profesionales de pasarela, fotografía, cuerpo,
+      cámara, comunicación, estilismo, maquillaje y bienestar.
+    </p>
+  </section>
+
+  {founderProfile && (
+    <section class="section founder-section is-profile">
+      <EditorialImage
+        src={founder.image}
+        alt="Retrato de la fundadora demo de ALMA"
+        ratio="portrait"
+        transitionName={`teacher-image-${founderProfile.slug}`}
+        parallax
+      />
+      <div class="founder-copy js-reveal">
+        <p class="eyebrow">Fundadora y dirección</p>
+        <h2 style={`view-transition-name:teacher-name-${founderProfile.slug}`}>{founder.name}</h2>
+        <p>{founder.bio}</p>
+        <blockquote>{founder.vision}</blockquote>
+        <a class="button is-secondary" href={`/equipo/${founderProfile.slug}`}>Ver ficha de dirección <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+  )}
+
+  <section class="section">
+    <SectionHeading
+      eyebrow="Docentes demo"
+      title="Especialistas con una mirada | práctica y editorial"
+      lead="Cada perfil está conectado con sus asignaturas para que el programa se entienda como un sistema."
+      number="01"
+    />
+    <div class="teacher-grid">
+      {teachingTeam.map((teacher) => <TeacherCard teacher={teacher} />)}
+    </div>
+  </section>
+
+  <CTA
+    title="El equipo sostiene la metodología."
+    text="Consulta las asignaturas para ver cómo cada docente encaja dentro del programa completo."
+    href="/formacion"
+    label="Ver formación"
+  />
+</BaseLayout>

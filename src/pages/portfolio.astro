@@ -1,0 +1,40 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CTA from "../components/CTA.astro";
+import Gallery from "../components/Gallery.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import { gallery } from "../data/gallery";
+import { imageLibrary } from "../data/site";
+---
+
+<BaseLayout
+  title="Portfolio editorial demo"
+  description="Galería demo de ALMA con referencias visuales de pasarela, estudio, backstage, retrato y estilismo."
+  image={imageLibrary.heroSecondary}
+>
+  <section class="page-hero">
+    <div>
+      <p class="eyebrow">Portfolio / Galería demo</p>
+      <h1 class="split-lines">
+        <span data-line>Una dirección visual</span>
+        <span data-line>pensada para fotografías reales.</span>
+      </h1>
+    </div>
+    <p>
+      Esta galería utiliza imágenes demo para mostrar tono, ritmo y composición.
+      Debe sustituirse por sesiones reales de ALMA cuando estén disponibles.
+    </p>
+  </section>
+
+  <section class="section gallery-section">
+    <SectionHeading
+      eyebrow="Galería"
+      title="Editorial, pasarela, | estudio y backstage"
+      lead="El grid está diseñado con formatos distintos para evitar una apariencia de tarjetas idénticas."
+      number="01"
+    />
+    <Gallery images={gallery} />
+  </section>
+
+  <CTA href="/contacto" label="Contactar" />
+</BaseLayout>

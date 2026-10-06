@@ -1,0 +1,42 @@
+---
+import { contact, navItems, siteMeta } from "../data/site";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a class="brand is-footer" href="/">
+        <span class="brand-mark">{siteMeta.name}</span>
+        <span class="brand-sub">{siteMeta.descriptor}</span>
+      </a>
+      <p>
+        Proyecto demo de escuela de modelaje y agencia de imagen. Todos los datos
+        de contacto y perfiles son ficticios hasta recibir la información real.
+      </p>
+    </div>
+
+    <nav class="footer-nav" aria-label="Navegación secundaria">
+      <span class="footer-title">Navegación</span>
+      {navItems.map((item) => <a href={item.href}>{item.label}</a>)}
+      <a href="/portfolio">Portfolio</a>
+      <a href="/preguntas-frecuentes">Preguntas frecuentes</a>
+    </nav>
+
+    <div class="footer-contact">
+      <span class="footer-title">Contacto demo</span>
+      <a href={`mailto:${contact.email}`}>{contact.email}</a>
+      <a href={`tel:${contact.phone.replaceAll(" ", "")}`}>{contact.phone}</a>
+      <span>{contact.instagram}</span>
+      <span>{contact.city}</span>
+    </div>
+
+    <div class="footer-legal">
+      <span class="footer-title">Legal</span>
+      <a href="/aviso-legal">Aviso legal</a>
+      <a href="/privacidad">Privacidad</a>
+      <span>© {year} ALMA</span>
+    </div>
+  </div>
+</footer>

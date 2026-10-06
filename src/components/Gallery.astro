@@ -1,0 +1,21 @@
+---
+import type { GalleryImage } from "../data/gallery";
+
+interface Props {
+  images: GalleryImage[];
+  dark?: boolean;
+}
+
+const { images, dark = false } = Astro.props;
+---
+
+<div class:list={["gallery-grid", { "is-dark": dark }, "stagger-list"]}>
+  {
+    images.map((image) => (
+      <figure class:list={["gallery-item", `is-${image.shape}`]}>
+        <img src={image.src} alt={image.alt} loading="lazy" decoding="async" />
+        <figcaption>{image.label}</figcaption>
+      </figure>
+    ))
+  }
+</div>

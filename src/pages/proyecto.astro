@@ -1,0 +1,86 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CTA from "../components/CTA.astro";
+import EditorialImage from "../components/EditorialImage.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import { collaborator, founder, imageLibrary } from "../data/site";
+---
+
+<BaseLayout
+  title="Historia, filosofía y fundadora"
+  description="Historia demo del proyecto ALMA, filosofía de formación, fundadora y colaboración inicial integrada."
+  image={founder.image}
+>
+  <section class="page-hero">
+    <div>
+      <p class="eyebrow">Proyecto / Filosofía</p>
+      <h1 class="split-lines">
+        <span data-line>Una escuela para aprender</span>
+        <span data-line>a ocupar una imagen con intención.</span>
+      </h1>
+    </div>
+    <p>
+      ALMA se presenta como un proyecto empresarial ya estructurado: escuela,
+      agencia, equipo, metodología, colaboración inicial y una identidad visual lista
+      para crecer con datos reales.
+    </p>
+  </section>
+
+  <section class="section founder-section">
+    <EditorialImage src={founder.image} alt="Retrato de Clara Montes, fundadora demo" ratio="portrait" parallax />
+    <div class="founder-copy js-reveal">
+      <p class="eyebrow">Fundadora demo</p>
+      <h2>{founder.name}</h2>
+      <p>{founder.bio}</p>
+      <blockquote>{founder.vision}</blockquote>
+    </div>
+  </section>
+
+  <section class="section project-values">
+    <SectionHeading
+      eyebrow="Filosofía"
+      title="La imagen como oficio, | no como superficie"
+      lead="El proyecto se apoya en una idea sencilla: una persona puede aprender a moverse mejor ante la mirada profesional sin perder naturalidad."
+      number="01"
+    />
+    <div class="method-cards stagger-list">
+      <article>
+        <span>01</span>
+        <h3>Presencia</h3>
+        <p>Entrenar cómo estar en cámara, pasarela, sala y conversación profesional.</p>
+      </article>
+      <article>
+        <span>02</span>
+        <h3>Criterio</h3>
+        <p>Leer una propuesta visual y tomar decisiones de imagen con coherencia.</p>
+      </article>
+      <article>
+        <span>03</span>
+        <h3>Profesionalidad</h3>
+        <p>Entender tiempos, códigos, preparación y relación con equipos creativos.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section two-column reversed">
+    <div class="stacked-copy js-reveal">
+      <p class="eyebrow">Colaboración inicial</p>
+      <h2>{collaborator.name}</h2>
+      <p>{collaborator.description}</p>
+      <strong>{collaborator.replaceNote}</strong>
+      <p>
+        La colaboración se integra en la historia del proyecto como apoyo técnico y
+        creativo para la primera etapa: producción, dirección de arte y preparación
+        de materiales visuales.
+      </p>
+    </div>
+    <EditorialImage src={imageLibrary.project} alt="Retrato editorial de proyecto ALMA" ratio="portrait" parallax />
+  </section>
+
+  <CTA
+    title="El proyecto ya tiene una narrativa completa."
+    text="Formación, equipo, agencia, fundadora, colaboración y contacto quedan preparados para presentar la demo."
+    href="/contacto"
+    label="Solicitar información"
+  />
+</BaseLayout>

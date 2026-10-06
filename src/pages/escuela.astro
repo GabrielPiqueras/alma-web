@@ -1,0 +1,89 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CTA from "../components/CTA.astro";
+import EditorialImage from "../components/EditorialImage.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import { collaborator, imageLibrary, institutionalCopy } from "../data/site";
+---
+
+<BaseLayout
+  title="La escuela"
+  description="La escuela ALMA une técnica de modelaje, cámara, presencia, comunicación e imagen con una metodología práctica y contemporánea."
+  image={imageLibrary.escuela}
+>
+  <section class="page-hero">
+    <div>
+      <p class="eyebrow">ALMA / Escuela</p>
+      <h1 class="split-lines">
+        <span data-line>Formar presencia</span>
+        <span data-line>también es formar criterio.</span>
+      </h1>
+    </div>
+    <p>{institutionalCopy.schoolLead}</p>
+  </section>
+
+  <section class="section two-column">
+    <EditorialImage src={imageLibrary.escuela} alt="Pasarela contemporánea para ALMA" ratio="portrait" parallax />
+    <div class="stacked-copy js-reveal">
+      <p class="eyebrow">Método</p>
+      <h2>Una escuela profesional sin rigidez académica.</h2>
+      <p>
+        ALMA está diseñada para parecerse al sector al que prepara: sesiones, cámara,
+        dirección de movimiento, feedback concreto, cuidado visual y cultura profesional.
+      </p>
+      <p>
+        El plan combina módulos técnicos con acompañamiento de imagen. La persona
+        aprende a caminar, posar, comunicar, escuchar indicaciones y llegar preparada
+        a un casting, una producción o una presentación.
+      </p>
+    </div>
+  </section>
+
+  <section class="section method-grid">
+    <SectionHeading
+      eyebrow="Estructura"
+      title="Aprender desde situaciones reales"
+      lead="La escuela no se plantea como una acumulación de clases sueltas, sino como un recorrido de preparación profesional."
+      number="01"
+    />
+    <div class="method-cards stagger-list">
+      <article>
+        <span>01</span>
+        <h3>Observación</h3>
+        <p>Lectura de postura, presencia, forma de comunicarse y relación con cámara.</p>
+      </article>
+      <article>
+        <span>02</span>
+        <h3>Técnica</h3>
+        <p>Herramientas concretas de pasarela, posado, movimiento, voz y estilismo.</p>
+      </article>
+      <article>
+        <span>03</span>
+        <h3>Práctica</h3>
+        <p>Simulaciones de set, castings, presentación personal y feedback individual.</p>
+      </article>
+      <article>
+        <span>04</span>
+        <h3>Material</h3>
+        <p>Orientación para construir portfolio, redes y presentación profesional.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section editorial-story">
+    <div class="sticky-copy">
+      <p class="eyebrow">Colaboración integrada</p>
+      <h2>{collaborator.name}</h2>
+      <p>{collaborator.description}</p>
+      <strong>{collaborator.replaceNote}</strong>
+    </div>
+    <EditorialImage src={imageLibrary.backstage} alt="Backstage de moda con prendas" ratio="landscape" parallax />
+  </section>
+
+  <CTA
+    title="El programa completo ya está estructurado."
+    text="Revisa las asignaturas, objetivos y responsables docentes de esta primera versión demo."
+    href="/formacion"
+    label="Ver formación"
+  />
+</BaseLayout>

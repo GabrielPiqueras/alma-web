@@ -1,0 +1,93 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CTA from "../components/CTA.astro";
+import EditorialImage from "../components/EditorialImage.astro";
+import Gallery from "../components/Gallery.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import { agency } from "../data/agency";
+import { gallery } from "../data/gallery";
+import { imageLibrary, institutionalCopy } from "../data/site";
+---
+
+<BaseLayout
+  title="Agencia de imagen"
+  description="Vertiente demo de agencia de imagen de ALMA: desarrollo de perfiles, books, castings, producción visual y colaboraciones."
+  image={agency.heroImage}
+>
+  <section class="page-hero agency-page-hero is-dark">
+    <div>
+      <p class="eyebrow">ALMA / Agencia</p>
+      <h1 class="split-lines">
+        <span data-line>La formación continúa</span>
+        <span data-line>cuando el perfil necesita presentarse.</span>
+      </h1>
+    </div>
+    <p>{institutionalCopy.agencyLead}</p>
+  </section>
+
+  <section class="section agency-intro">
+    <EditorialImage src={agency.heroImage} alt="Producción editorial de agencia ALMA" ratio="landscape" eager parallax />
+    <div class="stacked-copy js-reveal">
+      <p class="eyebrow">Enfoque</p>
+      <h2>Agencia como acompañamiento, no como promesa vacía.</h2>
+      <p>{agency.intro}</p>
+    </div>
+  </section>
+
+  <section class="section is-dark services-section">
+    <SectionHeading
+      eyebrow="Servicios demo"
+      title="Producción, perfil | y oportunidades compatibles"
+      lead="La agencia se plantea como una extensión natural de la escuela, con servicios que ayudan a construir presentación profesional."
+      number="01"
+      tone="dark"
+    />
+    <div class="service-grid stagger-list">
+      {agency.services.map((service, index) => (
+        <article>
+          <span>{String(index + 1).padStart(2, "0")}</span>
+          <h3>{service.title}</h3>
+          <p>{service.text}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section agency-process">
+    <div class="sticky-copy">
+      <p class="eyebrow">Proceso</p>
+      <h2>De la lectura de perfil al material visible.</h2>
+      <p>
+        La agencia demo se organiza con pasos concretos para evitar improvisación:
+        primero se define el perfil, después se prepara material y solo entonces se
+        plantea la presentación a proyectos adecuados.
+      </p>
+    </div>
+    <ol class="process-list">
+      {agency.process.map((step, index) => (
+        <li class="js-reveal">
+          <span>{String(index + 1).padStart(2, "0")}</span>
+          <p>{step}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="section gallery-section">
+    <SectionHeading
+      eyebrow="Material visual"
+      title="Una agencia necesita imágenes | que puedan hablar por el perfil"
+      lead="Estas fotografías son demo y funcionan como guía estética para futuras sesiones reales."
+      number="02"
+    />
+    <Gallery images={[...gallery.slice(1, 4), { src: imageLibrary.detail, alt: "Retrato beauty editorial", label: "Beauty", shape: "portrait" }]} />
+  </section>
+
+  <CTA
+    title="¿Quieres presentar ALMA como proyecto?"
+    text="La página de contacto está preparada para solicitar dossier, reunión o información sobre la fase inicial."
+    href="/contacto"
+    label="Contactar"
+    dark
+  />
+</BaseLayout>

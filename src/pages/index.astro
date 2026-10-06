@@ -1,0 +1,182 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CTA from "../components/CTA.astro";
+import EditorialImage from "../components/EditorialImage.astro";
+import Gallery from "../components/Gallery.astro";
+import SectionHeading from "../components/SectionHeading.astro";
+import SubjectCard from "../components/SubjectCard.astro";
+import TeacherCard from "../components/TeacherCard.astro";
+import { gallery } from "../data/gallery";
+import { subjects } from "../data/subjects";
+import { teachers } from "../data/teachers";
+import { collaborator, founder, imageLibrary, institutionalCopy } from "../data/site";
+import { agency } from "../data/agency";
+
+const featuredSubjects = subjects.slice(0, 6);
+const featuredTeachers = teachers.filter((teacher) => !teacher.isFounder).slice(0, 6);
+---
+
+<BaseLayout
+  title="ALMA — Escuela & Agencia de Imagen"
+  description="Demo profesional de ALMA, una escuela de modelaje y agencia de imagen con formación, equipo docente, agencia y proyecto empresarial."
+  image={imageLibrary.hero}
+  pageClass="home-page"
+>
+  <section class="hero home-hero">
+    <div class="hero-copy">
+      <p class="eyebrow hero-eyebrow">ALMA / Escuela & Agencia de Imagen</p>
+      <h1 class="hero-title split-lines" aria-label="ALMA">
+        <span data-line>ALMA</span>
+      </h1>
+      <p class="hero-claim split-lines">
+        {institutionalCopy.heroClaim.split(".").filter(Boolean).map((line) => (
+          <span data-line>{line.trim()}.</span>
+        ))}
+      </p>
+      <p class="hero-lead">{institutionalCopy.heroLead}</p>
+      <div class="hero-actions">
+        <a class="button" href="/escuela">Descubre ALMA <span aria-hidden="true">→</span></a>
+        <a class="text-link" href="/formacion">Conoce la formación <span aria-hidden="true">→</span></a>
+      </div>
+    </div>
+    <div class="hero-media-wrap">
+      <span class="vertical-label">Formación / Imagen / Talento</span>
+      <EditorialImage
+        src={imageLibrary.hero}
+        alt="Retrato editorial de moda para la demo de ALMA"
+        ratio="portrait"
+        class="hero-media"
+        eager
+        parallax
+      />
+      <div class="hero-note">
+        <span>2026</span>
+        <p>Programa demo para presentar el proyecto empresarial.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section intro-split">
+    <SectionHeading
+      eyebrow="La idea"
+      title="Escuela y agencia | dentro del mismo proyecto"
+      lead="ALMA prepara perfiles desde la técnica y la presencia, y después los acompaña en la construcción de material, oportunidades y criterio profesional."
+      number="01"
+    />
+    <div class="pillar-grid">
+      <article class="pillar js-reveal">
+        <span>01 — Escuela</span>
+        <h3>Formación integral para moverse con seguridad en imagen, moda y cámara.</h3>
+        <p>
+          Un programa organizado por asignaturas reales: pasarela, posado, expresión,
+          comunicación, estilismo, protocolo, redes y bienestar profesional.
+        </p>
+      </article>
+      <article class="pillar js-reveal">
+        <span>02 — Agencia</span>
+        <h3>Desarrollo visual y preparación de perfiles para oportunidades compatibles.</h3>
+        <p>
+          Book, test shoots, preparación de castings y colaboración con equipos creativos
+          cuando el perfil y el proyecto encajan.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="manifesto-band">
+    <div class="manifesto-inner">
+      <p class="eyebrow">Manifiesto</p>
+      <blockquote class="split-lines">
+        {institutionalCopy.manifesto.split(".").filter(Boolean).map((line) => (
+          <span data-line>{line.trim()}.</span>
+        ))}
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="section sticky-showcase">
+    <div class="sticky-copy">
+      <SectionHeading
+        eyebrow="Plan formativo"
+        title="Asignaturas con método, | no una lista decorativa"
+        lead="Cada bloque responde a una situación real: desfilar, posar, presentarse, trabajar con un equipo o cuidar el propio perfil profesional."
+        number="02"
+      />
+      <a class="button is-secondary" href="/formacion">Ver programa completo <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="subject-feature-grid">
+      {featuredSubjects.map((subject) => <SubjectCard subject={subject} compact />)}
+    </div>
+  </section>
+
+  <section class="section team-preview">
+    <SectionHeading
+      eyebrow="Equipo docente demo"
+      title="Profesionales de cámara, | movimiento e imagen"
+      lead="El equipo combina perfiles de pasarela, fotografía, interpretación, comunicación, estilismo, maquillaje y bienestar aplicado al sector."
+      number="03"
+    />
+    <div class="teacher-rail">
+      {featuredTeachers.map((teacher) => <TeacherCard teacher={teacher} />)}
+    </div>
+    <div class="section-actions">
+      <a class="text-link" href="/equipo">Ver todo el equipo <span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
+  <section class="agency-band">
+    <div class="agency-copy js-reveal">
+      <p class="eyebrow">Agencia</p>
+      <h2>ALMA no termina al acabar una clase.</h2>
+      <p>{agency.intro}</p>
+      <a class="button is-light" href="/agencia">Explorar agencia <span aria-hidden="true">→</span></a>
+    </div>
+    <EditorialImage
+      src={agency.heroImage}
+      alt="Producción editorial de moda para la agencia ALMA"
+      ratio="landscape"
+      class="agency-image"
+      parallax
+    />
+  </section>
+
+  <section class="section founder-section">
+    <EditorialImage
+      src={founder.image}
+      alt="Retrato de la fundadora demo de ALMA"
+      ratio="portrait"
+      class="founder-image"
+      parallax
+    />
+    <div class="founder-copy js-reveal">
+      <p class="eyebrow">Fundadora</p>
+      <h2>{founder.name}</h2>
+      <p>{founder.bio}</p>
+      <blockquote>{founder.vision}</blockquote>
+      <a class="text-link" href="/proyecto">Leer historia del proyecto <span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
+  <section class="collab-strip js-reveal">
+    <span>{collaborator.label}</span>
+    <h2>Un proyecto construido en colaboración.</h2>
+    <p>
+      {collaborator.name} participa como estudio creativo de apoyo en esta primera
+      versión demo: producción visual, dirección de arte y preparación de material.
+      <strong>{collaborator.replaceNote}</strong>
+    </p>
+  </section>
+
+  <section class="section gallery-section is-dark">
+    <SectionHeading
+      eyebrow="Portfolio editorial demo"
+      title="Pasarela, estudio, | backstage y retrato"
+      lead="Una galería pensada para sustituirse por imágenes reales de sesiones, clases, castings y producciones de ALMA."
+      number="04"
+      tone="dark"
+    />
+    <Gallery images={gallery.slice(0, 6)} dark />
+  </section>
+
+  <CTA />
+</BaseLayout>

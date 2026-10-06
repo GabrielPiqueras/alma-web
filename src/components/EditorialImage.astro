@@ -1,0 +1,34 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  ratio?: "portrait" | "landscape" | "square" | "wide";
+  class?: string;
+  eager?: boolean;
+  parallax?: boolean;
+  transitionName?: string;
+}
+
+const {
+  src,
+  alt,
+  ratio = "portrait",
+  class: className = "",
+  eager = false,
+  parallax = false,
+  transitionName
+} = Astro.props;
+---
+
+<figure
+  class:list={["editorial-image", `ratio-${ratio}`, "reveal-mask", className]}
+  style={transitionName ? `view-transition-name:${transitionName}` : undefined}
+>
+  <img
+    src={src}
+    alt={alt}
+    loading={eager ? "eager" : "lazy"}
+    decoding="async"
+    data-parallax={parallax ? "soft" : undefined}
+  />
+</figure>

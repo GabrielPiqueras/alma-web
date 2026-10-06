@@ -1,0 +1,59 @@
+/*
+  ALMA theme
+  ---------------------------------------------------------------------------
+  Edita SOLO el primer bloque para cambiar la paleta del sitio.
+
+  Ejemplo:
+  --alma-primary: #7d1f2c;   color principal actual, vino/burdeos
+  --alma-secondary: #b99562; acento actual, champagne
+
+  Las variables derivadas de abajo usan color-mix(), por lo que fondos,
+  bordes, brillos, estados focus e inputs se adaptan automáticamente cuando
+  cambias el color principal o secundario.
+*/
+
+:root {
+  /* COLORES EDITABLES */
+  --alma-primary: #7d1f2c;
+  --alma-secondary: #b99562;
+  --alma-dark: #171414;
+  --alma-light: #f5efe3;
+  --alma-paper: #fbf8f1;
+  --alma-sand: #d9cbb7;
+  --alma-muted: #747365;
+  /* DERIVADOS DEL COLOR PRINCIPAL */
+  --alma-primary-dark: color-mix(in srgb, var(--alma-primary) 58%, black);
+  --alma-primary-soft: color-mix(in srgb, var(--alma-primary) 18%, var(--alma-light));
+  --alma-primary-faint: color-mix(in srgb, var(--alma-primary) 30%, transparent);
+  --alma-primary-glow: color-mix(in srgb, var(--alma-primary) 24%, transparent);
+  --alma-primary-glow-soft: color-mix(in srgb, var(--alma-primary) 18%, transparent);
+  --alma-primary-line: color-mix(in srgb, var(--alma-primary) 82%, transparent);
+  --alma-primary-transparent: color-mix(in srgb, var(--alma-primary) 0%, transparent);
+
+  /* DERIVADOS DEL COLOR SECUNDARIO */
+  --alma-secondary-soft: color-mix(in srgb, var(--alma-secondary) 22%, transparent);
+  --alma-secondary-faint: color-mix(in srgb, var(--alma-secondary) 12%, transparent);
+  --alma-secondary-glow: color-mix(in srgb, var(--alma-secondary) 18%, transparent);
+  --alma-secondary-glow-soft: color-mix(in srgb, var(--alma-secondary) 12%, transparent);
+  --alma-secondary-line: color-mix(in srgb, var(--alma-secondary) 72%, transparent);
+  --alma-secondary-border: color-mix(in srgb, var(--alma-secondary) 42%, transparent);
+  --alma-secondary-focus: color-mix(in srgb, var(--alma-secondary) 70%, transparent);
+  --alma-secondary-focus-soft: color-mix(in srgb, var(--alma-secondary) 12%, transparent);
+
+  /* SUPERFICIES OSCURAS DERIVADAS */
+  --alma-night: color-mix(in srgb, var(--alma-dark) 94%, black);
+  --alma-night-soft: color-mix(in srgb, var(--alma-dark) 86%, var(--alma-primary));
+  --alma-surface: color-mix(in srgb, var(--alma-dark) 86%, var(--alma-primary));
+  --alma-surface-soft: color-mix(in srgb, var(--alma-dark) 76%, var(--alma-primary));
+  --alma-surface-accent: color-mix(in srgb, var(--alma-dark) 70%, var(--alma-primary));
+  --alma-input-bg: color-mix(in srgb, var(--alma-dark) 86%, var(--alma-primary));
+  --alma-input-bg-focus: color-mix(in srgb, var(--alma-dark) 76%, var(--alma-primary));
+
+  /* TEXTOS Y LINEAS */
+  --alma-text-on-dark: var(--alma-light);
+  --alma-text-on-dark-muted: color-mix(in srgb, var(--alma-light) 72%, transparent);
+  --alma-text-on-dark-soft: color-mix(in srgb, var(--alma-light) 56%, transparent);
+  --alma-line-light: color-mix(in srgb, var(--alma-light) 18%, transparent);
+  --alma-line-light-soft: color-mix(in srgb, var(--alma-light) 13%, transparent);
+  --alma-line-dark: color-mix(in srgb, var(--alma-dark) 14%, transparent);
+}

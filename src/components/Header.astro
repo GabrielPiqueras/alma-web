@@ -1,0 +1,73 @@
+---
+import { navItems, siteMeta } from "../data/site";
+
+const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isActive = (href: string) => {
+  const normalized = href.replace(/\/$/, "") || "/";
+  return pathname === normalized || pathname.startsWith(`${normalized}/`);
+};
+---
+
+<header class="site-header" data-site-header>
+  <div class="header-progress" data-scroll-progress></div>
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="Inicio ALMA">
+      <span class="brand-mark">{siteMeta.name}</span>
+      <span class="brand-sub">{siteMeta.descriptor}</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Navegación principal">
+      {
+        navItems.map((item) => (
+          <a href={item.href} class:list={["nav-link", { "is-active": isActive(item.href) }]}>
+            <span>{item.label}</span>
+          </a>
+        ))
+      }
+    </nav>
+
+    <a class="header-cta" href="/contacto">Solicitar dossier</a>
+
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      data-menu-toggle
+    >
+      <span class="menu-toggle-lines" aria-hidden="true"></span>
+      <span class="sr-only">Abrir menú</span>
+    </button>
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu" aria-hidden="true" data-mobile-menu>
+    <div class="mobile-menu-panel" role="dialog" aria-modal="true" aria-label="Menú principal">
+      <div class="mobile-menu-top">
+        <a class="brand is-menu" href="/" aria-label="Inicio ALMA">
+          <span class="brand-mark">{siteMeta.name}</span>
+          <span class="brand-sub">{siteMeta.descriptor}</span>
+        </a>
+        <button class="menu-close" type="button" data-menu-close>
+          <span aria-hidden="true">Cerrar</span>
+        </button>
+      </div>
+      <nav class="mobile-nav" aria-label="Navegación móvil">
+        {
+          navItems.map((item, index) => (
+            <a
+              href={item.href}
+              class:list={["mobile-nav-link", { "is-active": isActive(item.href) }]}
+              style={`--item-index:${index}`}
+            >
+              <span>{item.label}</span>
+            </a>
+          ))
+        }
+      </nav>
+      <div class="mobile-menu-meta">
+        <span>ALMA / Escuela & Agencia</span>
+        <a href="mailto:hola@almaimagen.demo">hola@almaimagen.demo</a>
+      </div>
+    </div>
+  </div>
+</header>

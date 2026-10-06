@@ -1,0 +1,58 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CTA from "../../components/CTA.astro";
+import SectionHeading from "../../components/SectionHeading.astro";
+import SubjectCard from "../../components/SubjectCard.astro";
+import { subjects } from "../../data/subjects";
+import { imageLibrary } from "../../data/site";
+---
+
+<BaseLayout
+  title="Formación y asignaturas"
+  description="Programa demo de formación ALMA con asignaturas, objetivos, metodología y profesorado responsable."
+  image={imageLibrary.escuela}
+>
+  <section class="page-hero">
+    <div>
+      <p class="eyebrow">Formación / Programa demo</p>
+      <h1 class="split-lines">
+        <span data-line>Un plan formativo</span>
+        <span data-line>para trabajar la imagen con método.</span>
+      </h1>
+    </div>
+    <p>
+      Diez asignaturas conectadas entre sí para preparar presencia, cámara, pasarela,
+      comunicación, estilismo, producción y bienestar profesional.
+    </p>
+  </section>
+
+  <section class="section program-intro">
+    <SectionHeading
+      eyebrow="Programa"
+      title="Asignaturas centrales"
+      lead="Cada ficha incluye objetivos, contenidos, metodología, duración demo y profesorado responsable."
+      number="01"
+    />
+    <div class="subjects-grid">
+      {subjects.map((subject) => <SubjectCard subject={subject} />)}
+    </div>
+  </section>
+
+  <section class="section program-flow">
+    <p class="eyebrow">Recorrido sugerido</p>
+    <ol class="timeline-list">
+      <li><span>01</span><p>Base corporal, pasarela y expresión.</p></li>
+      <li><span>02</span><p>Trabajo de cámara, estilismo y maquillaje.</p></li>
+      <li><span>03</span><p>Comunicación, redes y protocolo profesional.</p></li>
+      <li><span>04</span><p>Preparación de portfolio y conexión con agencia.</p></li>
+    </ol>
+  </section>
+
+  <CTA
+    title="La formación conecta con la agencia."
+    text="ALMA prepara perfiles para que puedan presentarse con material, criterio y una lectura profesional del sector."
+    href="/agencia"
+    label="Ver agencia"
+    dark
+  />
+</BaseLayout>

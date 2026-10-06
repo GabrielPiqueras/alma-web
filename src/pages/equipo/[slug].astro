@@ -1,0 +1,87 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CTA from "../../components/CTA.astro";
+import EditorialImage from "../../components/EditorialImage.astro";
+import SubjectCard from "../../components/SubjectCard.astro";
+import { subjects } from "../../data/subjects";
+import { teachers, type Teacher } from "../../data/teachers";
+
+export function getStaticPaths() {
+  return teachers.map((teacher) => ({
+    params: { slug: teacher.slug },
+    props: { teacher }
+  }));
+}
+
+const { teacher } = Astro.props as { teacher: Teacher };
+const relatedSubjects = subjects.filter((subject) => teacher.subjectSlugs.includes(subject.slug));
+---
+
+<BaseLayout
+  title={`${teacher.name} — Equipo`}
+  description={`${teacher.name}, ${teacher.role} en ALMA. ${teacher.specialty}.`}
+  image={teacher.image}
+  jsonLd={[
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: teacher.name,
+      jobTitle: teacher.role,
+      description: teacher.bio,
+      image: teacher.image
+    }
+  ]}
+>
+  <section class="detail-hero teacher-detail">
+    <div class="detail-copy">
+      <p class="eyebrow">{teacher.isFounder ? "Dirección / Fundadora" : "Equipo docente demo"}</p>
+      <h1 class="split-lines" style={`view-transition-name:teacher-name-${teacher.slug}`}>
+        <span data-line>{teacher.name}</span>
+      </h1>
+      <p>{teacher.bio}</p>
+      <div class="detail-meta">
+        <span>{teacher.role}</span>
+        <span>{teacher.specialty}</span>
+      </div>
+    </div>
+    <EditorialImage
+      src={teacher.image}
+      alt={teacher.alt}
+      ratio="portrait"
+      transitionName={`teacher-image-${teacher.slug}`}
+      eager
+      parallax
+    />
+  </section>
+
+  <section class="section profile-body">
+    <div class="quote-panel js-reveal">
+      <p class="eyebrow">Mirada docente</p>
+      <blockquote>{teacher.quote}</blockquote>
+      {teacher.social && <span>{teacher.social}</span>}
+    </div>
+    <div class="experience-panel js-reveal">
+      <p class="eyebrow">Experiencia demo</p>
+      <ul class="check-list">
+        {teacher.experience.map((item) => <li>{item}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section related-section">
+    <div class="section-inline-heading">
+      <p class="eyebrow">Asignaturas vinculadas</p>
+      <h2>El perfil enlaza con su parte del programa.</h2>
+    </div>
+    <div class="subjects-grid is-related">
+      {relatedSubjects.map((subject) => <SubjectCard subject={subject} compact />)}
+    </div>
+  </section>
+
+  <CTA
+    title="Volver al equipo docente."
+    text="Consulta todos los perfiles demo que construyen la metodología ALMA."
+    href="/equipo"
+    label="Ver equipo"
+  />
+</BaseLayout>

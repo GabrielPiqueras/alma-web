@@ -1,0 +1,21 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  number?: string;
+  align?: "left" | "center";
+  tone?: "light" | "dark";
+}
+
+const { eyebrow, title, lead, number, align = "left", tone = "light" } = Astro.props;
+---
+
+<header class:list={["section-heading", `is-${align}`, `is-${tone}`, "js-reveal"]}>
+  {number && <span class="section-number">{number}</span>}
+  {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+  <h2 class="split-lines">
+    {title.split("|").map((line) => <span data-line>{line.trim()}</span>)}
+  </h2>
+  {lead && <p class="section-lead">{lead}</p>}
+</header>

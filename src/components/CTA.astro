@@ -1,0 +1,26 @@
+---
+interface Props {
+  title?: string;
+  text?: string;
+  href?: string;
+  label?: string;
+  dark?: boolean;
+}
+
+const {
+  title = "Tu presencia empieza aquí.",
+  text = "Conoce la formación, el equipo y la vertiente de agencia de ALMA.",
+  href = "/contacto",
+  label = "Contacta con ALMA",
+  dark = false
+} = Astro.props;
+---
+
+<section class:list={["cta-section", { "is-dark": dark }]}>
+  <div class="cta-inner js-reveal">
+    <p class="eyebrow">ALMA / Próximo paso</p>
+    <h2 class="split-lines">{title.split("|").map((line) => <span data-line>{line}</span>)}</h2>
+    <p>{text}</p>
+    <a class="button" href={href}>{label}<span aria-hidden="true">→</span></a>
+  </div>
+</section>

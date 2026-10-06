@@ -1,0 +1,34 @@
+---
+import type { Subject } from "../data/subjects";
+import { teachers } from "../data/teachers";
+
+interface Props {
+  subject: Subject;
+  compact?: boolean;
+}
+
+const { subject, compact = false } = Astro.props;
+const subjectTeachers = teachers.filter((teacher) => subject.teacherSlugs.includes(teacher.slug));
+---
+
+<article class:list={["subject-card", { "is-compact": compact }, "js-reveal"]}>
+  <a href={`/formacion/${subject.slug}`} class="subject-card-link" aria-label={`Ver asignatura ${subject.title}`}>
+    <div
+      class="subject-card-media reveal-mask"
+      style={`view-transition-name:subject-image-${subject.slug}`}
+    >
+      <img src={subject.image} alt={subject.alt} loading="lazy" decoding="async" />
+    </div>
+    <div class="subject-card-body">
+      <span class="subject-number">{subject.number}</span>
+      <p class="subject-kicker">{subject.kicker}</p>
+      <h3 style={`view-transition-name:subject-title-${subject.slug}`}>{subject.title}</h3>
+      <p>{subject.summary}</p>
+      <div class="subject-meta">
+        <span>{subject.duration}</span>
+        <span>{subjectTeachers.map((teacher) => teacher.name).join(" / ")}</span>
+      </div>
+      <span class="text-link">Ver ficha <span aria-hidden="true">→</span></span>
+    </div>
+  </a>
+</article>

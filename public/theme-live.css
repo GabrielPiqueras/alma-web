@@ -1,0 +1,15 @@
+/*
+  ALMA live theme overrides.
+  Este archivo lo genera tools/theme-editor.mjs al guardar desde el editor visual.
+  No lo edites a mano; cambia src/styles/theme.css o usa Editar colores ALMA.bat.
+*/
+
+:root {
+  --alma-primary: #7d1f2c;
+  --alma-secondary: #b99562;
+  --alma-dark: #171414;
+  --alma-light: #f5efe3;
+  --alma-paper: #fbf8f1;
+  --alma-sand: #d9cbb7;
+  --alma-muted: #747365;
+}

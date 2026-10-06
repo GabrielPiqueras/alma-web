@@ -1,0 +1,50 @@
+---
+import { contact } from "../data/site";
+---
+
+<form
+  class="contact-form"
+  data-contact-form
+  data-form-mode={contact.formMode}
+  data-endpoint={contact.formEndpoint}
+  novalidate
+>
+  <div class="form-grid">
+    <label>
+      <span>Nombre</span>
+      <input name="name" autocomplete="name" placeholder="Nombre y apellidos" required />
+    </label>
+    <label>
+      <span>Email</span>
+      <input name="email" type="email" autocomplete="email" placeholder="tu@email.com" required />
+    </label>
+    <label>
+      <span>Teléfono opcional</span>
+      <input name="phone" type="tel" autocomplete="tel" placeholder="Teléfono" />
+    </label>
+    <label>
+      <span>Motivo</span>
+      <select name="reason" required>
+        <option value="">Selecciona una opción</option>
+        <option>Información sobre formación</option>
+        <option>Agencia de imagen</option>
+        <option>Colaboración o empresa</option>
+        <option>Presentación del proyecto</option>
+      </select>
+    </label>
+  </div>
+  <label>
+    <span>Mensaje</span>
+    <textarea name="message" rows="6" placeholder="Cuéntanos qué necesitas preparar o presentar." required></textarea>
+  </label>
+  <label class="checkbox-label">
+    <input type="checkbox" name="privacy" required />
+    <span>He leído y acepto la política de privacidad demo.</span>
+  </label>
+  <p class="form-note">
+    Formulario en modo demostración. No se enviará ningún mensaje hasta configurar
+    un endpoint real en <code>src/data/site.ts</code>.
+  </p>
+  <button class="button" type="submit">Preparar solicitud <span aria-hidden="true">→</span></button>
+  <p class="form-status" data-form-status role="status" aria-live="polite"></p>
+</form>
