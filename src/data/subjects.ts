@@ -57,7 +57,7 @@ export const subjects: Subject[] = [
     duration: "20 horas demo",
     teacherSlugs: ["mateo-salas"],
     image:
-      "https://images.unsplash.com/photo-1495385794356-15371f348c31?auto=format&fit=crop&w=1400&q=82",
+      "/assets/images/alma/subject-posado.jpg",
     alt: "Sesión editorial con modelo mirando a cámara",
     objectives: [
       "Desarrollar recursos de pose sin automatismos.",
@@ -85,7 +85,7 @@ export const subjects: Subject[] = [
     duration: "16 horas demo",
     teacherSlugs: ["ines-calderon"],
     image:
-      "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1400&q=82",
+      "/assets/images/alma/subject-movimiento.jpg",
     alt: "Persona en movimiento dentro de un estudio fotográfico",
     objectives: [
       "Reconocer bloqueos posturales y corregirlos.",
@@ -113,7 +113,7 @@ export const subjects: Subject[] = [
     duration: "14 horas demo",
     teacherSlugs: ["diego-varela"],
     image:
-      "https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?auto=format&fit=crop&w=1400&q=82",
+      "/assets/images/alma/subject-camara.jpg",
     alt: "Retrato cinematográfico en estudio",
     objectives: [
       "Aprender a sostener cámara en video.",
@@ -141,7 +141,7 @@ export const subjects: Subject[] = [
     duration: "12 horas demo",
     teacherSlugs: ["clara-montes", "noa-beltran"],
     image:
-      "https://images.unsplash.com/photo-1512310604669-443f26c35f52?auto=format&fit=crop&w=1400&q=82",
+      "/assets/images/alma/subject-comunicacion.jpg",
     alt: "Retrato editorial en interior con gesto sereno",
     objectives: [
       "Construir una presentación personal clara.",
@@ -169,7 +169,7 @@ export const subjects: Subject[] = [
     duration: "16 horas demo",
     teacherSlugs: ["valeria-prado"],
     image:
-      "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=1400&q=82",
+      "/assets/images/alma/subject-estilismo.jpg",
     alt: "Detalle de estilismo editorial con abrigo y luz natural",
     objectives: [
       "Entender silueta, proporción y color.",
@@ -197,7 +197,7 @@ export const subjects: Subject[] = [
     duration: "10 horas demo",
     teacherSlugs: ["marta-quesada"],
     image:
-      "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1400&q=82",
+      "/assets/images/alma/subject-maquillaje.jpg",
     alt: "Mesa de maquillaje profesional con brochas y tonos naturales",
     objectives: [
       "Preparar piel y rostro para cámara.",
@@ -225,7 +225,7 @@ export const subjects: Subject[] = [
     duration: "12 horas demo",
     teacherSlugs: ["noa-beltran"],
     image:
-      "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=1400&q=82",
+      "/assets/images/alma/subject-redes.jpg",
     alt: "Mesa creativa con portátil, referencias visuales y teléfono",
     objectives: [
       "Definir una presentación digital coherente.",
@@ -280,7 +280,7 @@ export const subjects: Subject[] = [
     duration: "10 horas demo",
     teacherSlugs: ["elena-sanabria"],
     image:
-      "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1400&q=82",
+      "/assets/images/alma/subject-bienestar.jpg",
     alt: "Persona estirando en un estudio con luz suave",
     objectives: [
       "Crear rutinas de preparación sin obsesión.",

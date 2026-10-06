@@ -30,39 +30,39 @@ export const navItems = [
 
 export const imageLibrary = {
   hero:
-    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1800&q=82",
+    "/assets/images/alma/hero.jpg",
   heroSecondary:
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=82",
+    "/assets/images/alma/beauty-portrait.jpg",
   escuela:
-    "https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1500&q=82",
+    "/assets/images/alma/runway.jpg",
   agencia:
-    "https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=1600&q=82",
+    "/assets/images/alma/agency-editorial.jpg",
   founder:
-    "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=1200&q=82",
+    "/assets/images/alma/founder.jpg",
   project:
-    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=82",
+    "/assets/images/alma/editorial-portrait.jpg",
   contact:
-    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=82",
+    "/assets/images/alma/editorial-portrait.jpg",
   backstage:
-    "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1400&q=82",
+    "/assets/images/alma/backstage.jpg",
   detail:
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=82",
+    "/assets/images/alma/beauty-portrait.jpg",
   teacherAitana:
-    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=82",
+    "/assets/images/alma/teacher-aitana.jpg",
   teacherMateo:
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=82",
+    "/assets/images/alma/teacher-mateo.jpg",
   teacherInes:
-    "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=900&q=82",
+    "/assets/images/alma/teacher-ines.jpg",
   teacherDiego:
-    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=82",
+    "/assets/images/alma/teacher-diego.jpg",
   teacherNoa:
-    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&q=82",
+    "/assets/images/alma/teacher-noa.jpg",
   teacherValeria:
-    "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?auto=format&fit=crop&w=900&q=82",
+    "/assets/images/alma/teacher-valeria.jpg",
   teacherMarta:
-    "https://images.unsplash.com/photo-1512310604669-443f26c35f52?auto=format&fit=crop&w=900&q=82",
+    "/assets/images/alma/teacher-marta.jpg",
   teacherElena:
-    "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=900&q=82"
+    "/assets/images/alma/teacher-elena.jpg"
 };
 
 export const founder = {

@@ -22,7 +22,7 @@ export const gallery: GalleryImage[] = [
     shape: "landscape"
   },
   {
-    src: "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1300&q=82",
+    src: "/assets/images/alma/gallery-styling.jpg",
     alt: "Perchero con prendas de moda en estudio",
     label: "Estilismo",
     shape: "square"
@@ -34,7 +34,7 @@ export const gallery: GalleryImage[] = [
     shape: "wide"
   },
   {
-    src: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=82",
+    src: "/assets/images/alma/gallery-portrait.jpg",
     alt: "Retrato editorial en blanco y negro",
     label: "Retrato",
     shape: "portrait"
@@ -46,13 +46,13 @@ export const gallery: GalleryImage[] = [
     shape: "portrait"
   },
   {
-    src: "https://images.unsplash.com/photo-1520975661595-6453be3f7070?auto=format&fit=crop&w=1400&q=82",
+    src: "/assets/images/alma/gallery-set.jpg",
     alt: "Detalle de sesión editorial en estudio",
     label: "Set",
     shape: "landscape"
   },
   {
-    src: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1200&q=82",
+    src: "/assets/images/alma/gallery-talent.jpg",
     alt: "Modelo con estilismo contemporáneo",
     label: "Talento",
     shape: "portrait"
