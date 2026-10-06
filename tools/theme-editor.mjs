@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir, readdir, rename, unlink, copyFile, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { basename, dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 
@@ -10,6 +10,11 @@ const projectRoot = dirname(__dirname);
 const themePath = join(projectRoot, "src", "styles", "theme.css");
 const liveThemePath = join(projectRoot, "public", "theme-live.css");
 const distLiveThemePath = join(projectRoot, "dist", "theme-live.css");
+const imageAssetsPath = join(projectRoot, "public", "assets", "images", "alma");
+const distImageAssetsPath = join(projectRoot, "dist", "assets", "images", "alma");
+const imageRouteBase = "/assets/images/alma";
+const oldImagePrefix = "OLD_";
+const allowedImageExtensions = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif", ".gif", ".svg"]);
 
 const editableColors = [
   { key: "--alma-primary", label: "Color principal", hint: "Controla el vino/burdeos: brillos, fondos, bordes, inputs y acentos derivados." },
@@ -100,6 +105,208 @@ async function saveTheme(nextValues) {
   return { values: saved, liveFiles };
 }
 
+function normalizeImageName(fileName, { allowBackup = false } = {}) {
+  if (typeof fileName !== "string" || !fileName.trim()) throw new Error("Imagen no válida.");
+  const safeName = basename(fileName.trim());
+  if (safeName !== fileName.trim()) throw new Error("Nombre de imagen no válido.");
+
+  const isBackup = safeName.startsWith(oldImagePrefix);
+  if (isBackup && !allowBackup) throw new Error("No se puede modificar directamente una copia OLD_.");
+
+  const visibleName = isBackup ? safeName.slice(oldImagePrefix.length) : safeName;
+  const extension = extname(visibleName).toLowerCase();
+  if (!allowedImageExtensions.has(extension)) throw new Error("Formato de imagen no admitido.");
+
+  return safeName;
+}
+
+function getImageBackupName(fileName) {
+  return `${oldImagePrefix}${fileName}`;
+}
+
+function getImagePublicPath(fileName) {
+  return join(imageAssetsPath, fileName);
+}
+
+function getImageDistPath(fileName) {
+  return join(distImageAssetsPath, fileName);
+}
+
+function getImageUrl(fileName, modified) {
+  const version = modified ? `?v=${Number(modified).toString(36)}` : "";
+  return `${imageRouteBase}/${encodeURIComponent(fileName)}${version}`;
+}
+
+async function pathExists(path) {
+  try {
+    await stat(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function readImageInfo(fileName) {
+  const safeName = normalizeImageName(fileName);
+  const imagePath = getImagePublicPath(safeName);
+  const imageStat = await stat(imagePath);
+  const backupName = getImageBackupName(safeName);
+  const backupPath = getImagePublicPath(backupName);
+  const backupExists = await pathExists(backupPath);
+  let backup = null;
+
+  if (backupExists) {
+    const backupStat = await stat(backupPath);
+    backup = {
+      fileName: backupName,
+      src: getImageUrl(backupName, backupStat.mtimeMs),
+      size: backupStat.size,
+      modified: backupStat.mtime.toISOString()
+    };
+  }
+
+  return {
+    fileName: safeName,
+    src: getImageUrl(safeName, imageStat.mtimeMs),
+    cleanSrc: `${imageRouteBase}/${safeName}`,
+    size: imageStat.size,
+    modified: imageStat.mtime.toISOString(),
+    extension: extname(safeName).toLowerCase(),
+    backup
+  };
+}
+
+async function listImages() {
+  await mkdir(imageAssetsPath, { recursive: true });
+  const entries = await readdir(imageAssetsPath, { withFileTypes: true });
+  const imageNames = entries
+    .filter((entry) => entry.isFile())
+    .map((entry) => entry.name)
+    .filter((name) => !name.startsWith(oldImagePrefix))
+    .filter((name) => allowedImageExtensions.has(extname(name).toLowerCase()))
+    .sort((a, b) => a.localeCompare(b, "es"));
+
+  return Promise.all(imageNames.map((name) => readImageInfo(name)));
+}
+
+async function syncImageToDist(fileName) {
+  if (!existsSync(join(projectRoot, "dist"))) return;
+  await mkdir(distImageAssetsPath, { recursive: true });
+  const sourcePath = getImagePublicPath(fileName);
+  const targetPath = getImageDistPath(fileName);
+
+  if (await pathExists(sourcePath)) {
+    await copyFile(sourcePath, targetPath);
+  } else if (await pathExists(targetPath)) {
+    await unlink(targetPath);
+  }
+}
+
+async function applyImage(fileName, buffer) {
+  const safeName = normalizeImageName(fileName);
+  if (!buffer?.length) throw new Error("No se ha recibido ninguna imagen.");
+
+  await mkdir(imageAssetsPath, { recursive: true });
+  const imagePath = getImagePublicPath(safeName);
+  const backupName = getImageBackupName(safeName);
+  const backupPath = getImagePublicPath(backupName);
+
+  if (!(await pathExists(imagePath))) throw new Error(`No existe la imagen ${safeName}.`);
+
+  const hadBackup = await pathExists(backupPath);
+  let movedToBackup = false;
+
+  if (!hadBackup) {
+    await rename(imagePath, backupPath);
+    movedToBackup = true;
+  }
+
+  try {
+    await writeFile(imagePath, buffer);
+  } catch (error) {
+    if (movedToBackup && !(await pathExists(imagePath))) await rename(backupPath, imagePath);
+    throw error;
+  }
+
+  await syncImageToDist(safeName);
+  await syncImageToDist(backupName);
+  return readImageInfo(safeName);
+}
+
+async function confirmImage(fileName) {
+  const safeName = normalizeImageName(fileName);
+  const backupName = getImageBackupName(safeName);
+  const backupPath = getImagePublicPath(backupName);
+
+  if (await pathExists(backupPath)) await unlink(backupPath);
+  await syncImageToDist(backupName);
+  return readImageInfo(safeName);
+}
+
+async function restoreImage(fileName) {
+  const safeName = normalizeImageName(fileName);
+  const imagePath = getImagePublicPath(safeName);
+  const backupName = getImageBackupName(safeName);
+  const backupPath = getImagePublicPath(backupName);
+
+  if (!(await pathExists(backupPath))) throw new Error(`No hay copia OLD_ para ${safeName}.`);
+  if (await pathExists(imagePath)) await unlink(imagePath);
+  await rename(backupPath, imagePath);
+
+  await syncImageToDist(safeName);
+  await syncImageToDist(backupName);
+  return readImageInfo(safeName);
+}
+
+function getImageContentType(fileName) {
+  const extension = extname(fileName).toLowerCase();
+  if (extension === ".jpg" || extension === ".jpeg") return "image/jpeg";
+  if (extension === ".png") return "image/png";
+  if (extension === ".webp") return "image/webp";
+  if (extension === ".avif") return "image/avif";
+  if (extension === ".gif") return "image/gif";
+  if (extension === ".svg") return "image/svg+xml";
+  return "application/octet-stream";
+}
+
+async function sendImageAsset(response, fileName) {
+  const safeName = normalizeImageName(fileName, { allowBackup: true });
+  const imagePath = getImagePublicPath(safeName);
+  if (!(await pathExists(imagePath))) return sendJson(response, 404, { error: "Imagen no encontrada." });
+
+  const buffer = await readFile(imagePath);
+  response.writeHead(200, {
+    "Content-Type": getImageContentType(safeName),
+    "Cache-Control": "no-store"
+  });
+  response.end(buffer);
+}
+
+function readRequestBody(request, maxBytes = 1024 * 1024 * 24) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let size = 0;
+
+    request.on("data", (chunk) => {
+      size += chunk.length;
+      if (size > maxBytes) {
+        request.destroy();
+        reject(new Error("La imagen es demasiado grande."));
+        return;
+      }
+      chunks.push(chunk);
+    });
+
+    request.on("end", () => resolve(Buffer.concat(chunks)));
+    request.on("error", reject);
+  });
+}
+
+async function readJsonBody(request) {
+  const buffer = await readRequestBody(request, 1024 * 64);
+  return JSON.parse(buffer.toString("utf8") || "{}");
+}
+
 function sendJson(response, statusCode, body) {
   response.writeHead(statusCode, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" });
   response.end(JSON.stringify(body));
@@ -116,7 +323,7 @@ function renderHtml() {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ALMA · Editor de colores</title>
+  <title>ALMA · Editor visual</title>
   <style>
     :root {
       --ui-primary: #7d1f2c;
@@ -132,6 +339,7 @@ function renderHtml() {
       color-scheme: dark;
     }
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
     body {
       margin: 0;
       min-width: 320px;
@@ -145,6 +353,9 @@ function renderHtml() {
     .brand { margin: 0 0 1rem; color: var(--ui-secondary); font-size: 0.78rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
     h1 { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(3.2rem, 9vw, 7rem); font-weight: 400; line-height: 0.9; }
     .intro { max-width: 34rem; color: color-mix(in srgb, var(--ui-light) 72%, transparent); font-size: 1.05rem; }
+    .tabs { display: flex; gap: 0.6rem; margin: 0 0 1rem; border-bottom: 1px solid var(--ui-line); padding-bottom: 1rem; }
+    .tab-button { border-color: var(--ui-line); background: rgba(0, 0, 0, 0.18); color: var(--ui-light); }
+    .tab-button.is-active { border-color: var(--ui-secondary); background: var(--ui-secondary); color: var(--ui-dark); }
     .layout { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(22rem, 0.6fr); gap: 1.2rem; align-items: start; }
     .panel, .preview { border: 1px solid var(--ui-line); background: radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--ui-primary) 18%, transparent), transparent 16rem), var(--ui-surface); box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24); }
     .panel { padding: 1.2rem; }
@@ -182,7 +393,25 @@ function renderHtml() {
     .swatches span:nth-child(6) { background: var(--ui-sand); }
     .swatches span:nth-child(7) { background: var(--ui-muted); }
     .note { margin-top: 1rem; color: color-mix(in srgb, var(--ui-light) 58%, transparent); font-size: 0.9rem; }
-    @media (max-width: 880px) { .hero, .layout, .color-grid { grid-template-columns: 1fr; } .preview { position: static; } }
+    .image-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.8rem; margin-bottom: 1rem; }
+    .image-toolbar h2 { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 400; line-height: 0.95; }
+    .image-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+    .image-card { border: 1px solid var(--ui-line); background: rgba(0, 0, 0, 0.16); padding: 0.85rem; display: grid; gap: 0.85rem; }
+    .image-card.has-backup { border-color: color-mix(in srgb, var(--ui-secondary) 62%, var(--ui-line)); }
+    .image-frame { width: 100%; aspect-ratio: 4 / 3; background: color-mix(in srgb, var(--ui-dark) 72%, var(--ui-sand)); overflow: hidden; border: 1px solid var(--ui-line); }
+    .image-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .image-old { display: grid; grid-template-columns: 5rem 1fr; align-items: center; gap: 0.7rem; border: 1px solid var(--ui-line); padding: 0.5rem; background: rgba(0, 0, 0, 0.2); }
+    .image-old .image-frame { aspect-ratio: 1 / 1; }
+    .image-old strong { display: block; color: var(--ui-secondary); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    .image-meta { display: grid; gap: 0.2rem; }
+    .image-meta h3 { margin: 0; font-size: 1rem; overflow-wrap: anywhere; }
+    .image-meta p { margin: 0; color: color-mix(in srgb, var(--ui-light) 60%, transparent); font-size: 0.84rem; }
+    .image-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.55rem; }
+    .image-actions button { width: 100%; padding-inline: 0.7rem; }
+    .image-actions .wide { grid-column: 1 / -1; }
+    .selected-file { min-height: 1.3rem; margin: 0; color: color-mix(in srgb, var(--ui-secondary) 84%, var(--ui-light)); font-size: 0.84rem; overflow-wrap: anywhere; }
+    .empty-state { border: 1px solid var(--ui-line); padding: 1rem; color: color-mix(in srgb, var(--ui-light) 66%, transparent); }
+    @media (max-width: 880px) { .hero, .layout, .color-grid, .image-grid { grid-template-columns: 1fr; } .preview { position: static; } }
   </style>
 </head>
 <body>
@@ -190,12 +419,18 @@ function renderHtml() {
     <section class="hero">
       <div>
         <p class="brand">ALMA / Editor visual</p>
-        <h1>Color del proyecto</h1>
+        <h1>Ajustes del proyecto</h1>
       </div>
-      <p class="intro">Cambia la paleta base de ALMA desde aquí. Al guardar, se actualiza <strong>src/styles/theme.css</strong> y también el tema vivo que carga la web.</p>
+      <p class="intro">Gestiona la paleta y las imágenes locales de ALMA desde una herramienta visual. Los cambios se escriben directamente en los archivos del proyecto.</p>
     </section>
 
-    <section class="layout">
+    <nav class="tabs" aria-label="Secciones del editor">
+      <button class="tab-button is-active" type="button" data-tab="colors">Colores</button>
+      <button class="tab-button" type="button" data-tab="images">Imágenes</button>
+      <a class="link-button" href="http://127.0.0.1:4321/" target="_blank" rel="noreferrer">Abrir web</a>
+    </nav>
+
+    <section class="layout" id="tab-colors">
       <form class="panel" id="theme-form">
         <div class="color-grid" id="fields"></div>
         <section class="suggestion" id="secondary-suggestion">
@@ -214,7 +449,6 @@ function renderHtml() {
         <div class="actions">
           <button type="submit">Guardar colores</button>
           <button class="secondary" type="button" id="reload">Recargar archivo</button>
-          <a class="link-button" href="http://127.0.0.1:4321/" target="_blank" rel="noreferrer">Abrir web</a>
         </div>
         <p class="status" id="status" role="status" aria-live="polite"></p>
         <p class="note">Si la web estaba abierta, recarga la pestaña tras guardar. El editor actualiza <code>public/theme-live.css</code> y, si existe, <code>dist/theme-live.css</code>.</p>
@@ -225,6 +459,19 @@ function renderHtml() {
         <div class="preview-body"><p>Vista previa rápida de la dirección visual. La web real aplica además variables derivadas para fondos, bordes y estados.</p><div class="chips"><span class="chip">Formación</span><span class="chip">Imagen</span><span class="chip">Talento</span></div></div>
         <div class="swatches" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
       </aside>
+    </section>
+
+    <section class="panel" id="tab-images" hidden>
+      <div class="image-toolbar">
+        <div>
+          <p class="brand">ALMA / Imágenes locales</p>
+          <h2>Imágenes</h2>
+        </div>
+        <button class="secondary" type="button" id="image-reload">Recargar imágenes</button>
+      </div>
+      <div class="image-grid" id="image-grid"></div>
+      <p class="status" id="image-status" role="status" aria-live="polite"></p>
+      <p class="note">Al aplicar una imagen, la anterior queda guardada como <code>OLD_nombre.ext</code>. Confirmar borra esa copia; restaurar recupera la anterior.</p>
     </section>
   </main>
 
@@ -237,6 +484,13 @@ function renderHtml() {
     const applySuggestionButton = document.querySelector('#apply-suggestion');
     const suggestionValue = document.querySelector('#suggestion-value');
     const suggestionSwatch = document.querySelector('#suggestion-swatch');
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabColors = document.querySelector('#tab-colors');
+    const tabImages = document.querySelector('#tab-images');
+    const imageGrid = document.querySelector('#image-grid');
+    const imageStatus = document.querySelector('#image-status');
+    const imageReloadButton = document.querySelector('#image-reload');
+    const selectedImages = new Map();
 
     const cssVarMap = {
       '--alma-primary': '--ui-primary',
@@ -247,6 +501,13 @@ function renderHtml() {
       '--alma-sand': '--ui-sand',
       '--alma-muted': '--ui-muted'
     };
+
+    function activateTab(tab) {
+      tabButtons.forEach((button) => button.classList.toggle('is-active', button.dataset.tab === tab));
+      tabColors.hidden = tab !== 'colors';
+      tabImages.hidden = tab !== 'images';
+      if (tab === 'images') loadImages().catch((error) => { imageStatus.textContent = error.message; });
+    }
 
     function setPreviewValue(key, value) {
       document.documentElement.style.setProperty(cssVarMap[key], value);
@@ -376,6 +637,120 @@ function renderHtml() {
       return values;
     }
 
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
+    }
+
+    function formatBytes(bytes) {
+      if (!Number.isFinite(bytes)) return '';
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    function renderImages(images) {
+      selectedImages.clear();
+      imageGrid.innerHTML = '';
+
+      if (!images.length) {
+        imageGrid.innerHTML = '<div class="empty-state">No hay imágenes en la carpeta local.</div>';
+        return;
+      }
+
+      for (const image of images) {
+        const card = document.createElement('article');
+        card.className = 'image-card' + (image.backup ? ' has-backup' : '');
+        const safeName = escapeHtml(image.fileName);
+        const oldBlock = image.backup
+          ? '<div class="image-old"><div class="image-frame"><img src="' + image.backup.src + '" alt="Imagen anterior de ' + safeName + '"></div><div><strong>Anterior disponible</strong><p>' + escapeHtml(image.backup.fileName) + '</p></div></div>'
+          : '';
+
+        card.innerHTML = [
+          '<div class="image-frame"><img src="' + image.src + '" alt="' + safeName + '"></div>',
+          '<div class="image-meta"><h3>' + safeName + '</h3><p>' + escapeHtml(image.cleanSrc) + '</p><p>' + formatBytes(image.size) + ' · ' + escapeHtml(image.extension) + '</p></div>',
+          oldBlock,
+          '<input type="file" accept="image/*" hidden>',
+          '<p class="selected-file" aria-live="polite"></p>',
+          '<div class="image-actions">',
+          '<button class="secondary choose-image" type="button">Cambiar imagen</button>',
+          '<button class="apply-image" type="button" disabled>Aplicar</button>',
+          '<button class="secondary confirm-image" type="button"' + (image.backup ? '' : ' disabled') + '>Confirmar</button>',
+          '<button class="secondary restore-image" type="button"' + (image.backup ? '' : ' disabled') + '>Restaurar</button>',
+          '</div>'
+        ].join('');
+
+        const fileInput = card.querySelector('input[type="file"]');
+        const selectedFileLabel = card.querySelector('.selected-file');
+        const applyButton = card.querySelector('.apply-image');
+
+        card.querySelector('.choose-image').addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', () => {
+          const file = fileInput.files && fileInput.files[0];
+          if (!file) return;
+          selectedImages.set(image.fileName, file);
+          selectedFileLabel.textContent = file.name;
+          applyButton.disabled = false;
+        });
+
+        applyButton.addEventListener('click', () => applySelectedImage(image.fileName));
+        card.querySelector('.confirm-image').addEventListener('click', () => postImageAction('/api/images/confirm', image.fileName));
+        card.querySelector('.restore-image').addEventListener('click', () => postImageAction('/api/images/restore', image.fileName));
+
+        imageGrid.append(card);
+      }
+    }
+
+    async function loadImages() {
+      imageStatus.textContent = 'Cargando imágenes...';
+      const response = await fetch('/api/images', { cache: 'no-store' });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'No se pudieron leer las imágenes.');
+      renderImages(data.images);
+      imageStatus.textContent = 'Imágenes cargadas desde la carpeta local.';
+    }
+
+    async function applySelectedImage(fileName) {
+      const file = selectedImages.get(fileName);
+      if (!file) {
+        imageStatus.textContent = 'Elige una imagen antes de aplicar.';
+        return;
+      }
+
+      imageStatus.textContent = 'Aplicando imagen...';
+      const response = await fetch('/api/images/apply?fileName=' + encodeURIComponent(fileName), {
+        method: 'POST',
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        body: await file.arrayBuffer()
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        imageStatus.textContent = data.error || 'No se pudo aplicar la imagen.';
+        return;
+      }
+      await loadImages();
+      imageStatus.textContent = 'Imagen aplicada. La anterior queda disponible para confirmar o restaurar.';
+    }
+
+    async function postImageAction(path, fileName) {
+      imageStatus.textContent = 'Actualizando imagen...';
+      const response = await fetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileName })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        imageStatus.textContent = data.error || 'No se pudo completar la acción.';
+        return;
+      }
+      await loadImages();
+      imageStatus.textContent = path.endsWith('/restore') ? 'Imagen restaurada.' : 'Cambio confirmado.';
+    }
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => activateTab(button.dataset.tab));
+    });
+
     applySuggestionButton.addEventListener('click', () => {
       setFieldValue('--alma-secondary', suggestionValue.textContent.trim());
       status.textContent = 'Secundario sugerido aplicado. Pulsa Guardar colores para escribirlo en el archivo.';
@@ -395,6 +770,7 @@ function renderHtml() {
     });
 
     reloadButton.addEventListener('click', () => loadTheme().catch((error) => { status.textContent = error.message; }));
+    imageReloadButton.addEventListener('click', () => loadImages().catch((error) => { imageStatus.textContent = error.message; }));
     loadTheme().catch((error) => { status.textContent = error.message; });
   </script>
 </body>
@@ -404,11 +780,47 @@ function renderHtml() {
 const server = createServer(async (request, response) => {
   try {
     const url = new URL(request.url ?? "/", "http://localhost");
+    if (request.method === "GET" && url.pathname.startsWith(`${imageRouteBase}/`)) {
+      const fileName = decodeURIComponent(url.pathname.slice(`${imageRouteBase}/`.length));
+      return sendImageAsset(response, fileName);
+    }
     if (request.method === "GET" && url.pathname === "/") return sendHtml(response);
     if (request.method === "GET" && url.pathname === "/api/theme") {
       const { values } = await readTheme();
       await writeLiveTheme(values);
       return sendJson(response, 200, { colors: editableColors, values, themePath, liveThemePath });
+    }
+    if (request.method === "GET" && url.pathname === "/api/images") {
+      const images = await listImages();
+      return sendJson(response, 200, { imageRouteBase, imageAssetsPath, images });
+    }
+    if (request.method === "POST" && url.pathname === "/api/images/apply") {
+      try {
+        const fileName = url.searchParams.get("fileName") ?? "";
+        const buffer = await readRequestBody(request);
+        const image = await applyImage(fileName, buffer);
+        return sendJson(response, 200, { image });
+      } catch (error) {
+        return sendJson(response, 400, { error: error.message });
+      }
+    }
+    if (request.method === "POST" && url.pathname === "/api/images/confirm") {
+      try {
+        const data = await readJsonBody(request);
+        const image = await confirmImage(data.fileName);
+        return sendJson(response, 200, { image });
+      } catch (error) {
+        return sendJson(response, 400, { error: error.message });
+      }
+    }
+    if (request.method === "POST" && url.pathname === "/api/images/restore") {
+      try {
+        const data = await readJsonBody(request);
+        const image = await restoreImage(data.fileName);
+        return sendJson(response, 200, { image });
+      } catch (error) {
+        return sendJson(response, 400, { error: error.message });
+      }
     }
     if (request.method === "POST" && url.pathname === "/api/theme") {
       let body = "";
@@ -447,7 +859,7 @@ function listen(port) {
   });
   server.listen(port, "127.0.0.1", () => {
     const url = `http://127.0.0.1:${port}/`;
-    console.log("ALMA · Editor visual de colores");
+    console.log("ALMA · Editor visual");
     console.log(`Archivo: ${themePath}`);
     console.log(`Editor:  ${url}`);
     console.log("Cierra esta ventana para apagar el editor.");
