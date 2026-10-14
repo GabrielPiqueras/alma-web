@@ -1,5 +1,6 @@
 ---
 import type { GalleryImage } from "../data/gallery";
+import { versionedImage } from "../data/imageVersions";
 
 interface Props {
   images: GalleryImage[];
@@ -13,7 +14,7 @@ const { images, dark = false } = Astro.props;
   {
     images.map((image) => (
       <figure class:list={["gallery-item", `is-${image.shape}`]}>
-        <img src={image.src} alt={image.alt} loading="lazy" decoding="async" />
+        <img src={versionedImage(image.src)} alt={image.alt} loading="lazy" decoding="async" />
         <figcaption>{image.label}</figcaption>
       </figure>
     ))

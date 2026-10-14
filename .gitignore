@@ -3,3 +3,4 @@ dist/
 .astro/
 .DS_Store
 npm-debug.log*
+public/assets/images/alma/OLD_*

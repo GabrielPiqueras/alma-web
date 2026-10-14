@@ -2,6 +2,7 @@
 import { ViewTransitions } from "astro:transitions";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import { versionedImage } from "../data/imageVersions";
 import { contact, imageLibrary, siteMeta } from "../data/site";
 import "../styles/theme.css";
 import "../styles/global.css";
@@ -24,7 +25,8 @@ const {
 
 const pageTitle = title.includes("ALMA") ? title : `${title} | ALMA`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? siteMeta.url).toString();
-const imageUrl = image.startsWith("http") ? image : new URL(image, siteMeta.url).toString();
+const metaImage = versionedImage(image);
+const imageUrl = metaImage.startsWith("http") ? metaImage : new URL(metaImage, siteMeta.url).toString();
 const schema = [
   {
     "@context": "https://schema.org",

@@ -4,6 +4,7 @@ import { existsSync } from "node:fs";
 import { basename, dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
+import { syncImageVersions } from "./image-versions.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = dirname(__dirname);
@@ -178,6 +179,7 @@ async function readImageInfo(fileName) {
 
 async function listImages() {
   await mkdir(imageAssetsPath, { recursive: true });
+  await syncImageVersions();
   const entries = await readdir(imageAssetsPath, { withFileTypes: true });
   const imageNames = entries
     .filter((entry) => entry.isFile())
@@ -230,6 +232,7 @@ async function applyImage(fileName, buffer) {
 
   await syncImageToDist(safeName);
   await syncImageToDist(backupName);
+  await syncImageVersions();
   return readImageInfo(safeName);
 }
 
@@ -240,6 +243,7 @@ async function confirmImage(fileName) {
 
   if (await pathExists(backupPath)) await unlink(backupPath);
   await syncImageToDist(backupName);
+  await syncImageVersions();
   return readImageInfo(safeName);
 }
 
@@ -255,6 +259,7 @@ async function restoreImage(fileName) {
 
   await syncImageToDist(safeName);
   await syncImageToDist(backupName);
+  await syncImageVersions();
   return readImageInfo(safeName);
 }
 

@@ -1,4 +1,6 @@
 ---
+import { versionedImage } from "../data/imageVersions";
+
 interface Props {
   src: string;
   alt: string;
@@ -18,6 +20,8 @@ const {
   parallax = false,
   transitionName
 } = Astro.props;
+
+const imageSrc = versionedImage(src);
 ---
 
 <figure
@@ -25,7 +29,7 @@ const {
   style={transitionName ? `view-transition-name:${transitionName}` : undefined}
 >
   <img
-    src={src}
+    src={imageSrc}
     alt={alt}
     loading={eager ? "eager" : "lazy"}
     decoding="async"

@@ -1,5 +1,6 @@
 ---
 import type { Teacher } from "../data/teachers";
+import { versionedImage } from "../data/imageVersions";
 
 interface Props {
   teacher: Teacher;
@@ -7,6 +8,7 @@ interface Props {
 }
 
 const { teacher, featured = false } = Astro.props;
+const teacherImage = versionedImage(teacher.image);
 ---
 
 <article class:list={["teacher-card", { "is-featured": featured }, "js-reveal"]}>
@@ -15,7 +17,7 @@ const { teacher, featured = false } = Astro.props;
       class="teacher-media reveal-mask"
       style={`view-transition-name:teacher-image-${teacher.slug}`}
     >
-      <img src={teacher.image} alt={teacher.alt} loading="lazy" decoding="async" />
+      <img src={teacherImage} alt={teacher.alt} loading="lazy" decoding="async" />
     </div>
     <div class="teacher-body">
       <p>{teacher.specialty}</p>
