@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "predev": "node tools/sync-image-versions.mjs",
+    "predev": "node tools/sync-assets.mjs",
     "dev": "astro dev",
-    "prebuild": "node tools/sync-image-versions.mjs",
+    "prebuild": "node tools/sync-assets.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "theme": "node tools/theme-editor.mjs"

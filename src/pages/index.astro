@@ -7,6 +7,7 @@ import SectionHeading from "../components/SectionHeading.astro";
 import SubjectCard from "../components/SubjectCard.astro";
 import TeacherCard from "../components/TeacherCard.astro";
 import { gallery } from "../data/gallery";
+import { versionedLogo } from "../data/logo";
 import { subjects } from "../data/subjects";
 import { teachers } from "../data/teachers";
 import { collaborator, founder, imageLibrary, institutionalCopy } from "../data/site";
@@ -14,6 +15,7 @@ import { agency } from "../data/agency";
 
 const featuredSubjects = subjects.slice(0, 6);
 const featuredTeachers = teachers.filter((teacher) => !teacher.isFounder).slice(0, 6);
+const logoSrc = versionedLogo();
 ---
 
 <BaseLayout
@@ -25,8 +27,8 @@ const featuredTeachers = teachers.filter((teacher) => !teacher.isFounder).slice(
   <section class="hero home-hero">
     <div class="hero-copy">
       <p class="eyebrow hero-eyebrow">ALMA / Escuela & Agencia de Imagen</p>
-      <h1 class="hero-title split-lines" aria-label="ALMA">
-        <span data-line>ALMA</span>
+      <h1 class="hero-title hero-logo-title" aria-label="ALMA">
+        <img class="hero-logo" src={logoSrc} alt="" />
       </h1>
       <p class="hero-claim split-lines">
         {institutionalCopy.heroClaim.split(".").filter(Boolean).map((line) => (

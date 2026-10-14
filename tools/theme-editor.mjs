@@ -5,6 +5,7 @@ import { basename, dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import { syncImageVersions } from "./image-versions.mjs";
+import { saveLogoBuffer, syncLogoVersion } from "./logo-tools.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = dirname(__dirname);
@@ -14,6 +15,7 @@ const distLiveThemePath = join(projectRoot, "dist", "theme-live.css");
 const imageAssetsPath = join(projectRoot, "public", "assets", "images", "alma");
 const distImageAssetsPath = join(projectRoot, "dist", "assets", "images", "alma");
 const imageRouteBase = "/assets/images/alma";
+const logoFileName = "logo.png";
 const oldImagePrefix = "OLD_";
 const allowedImageExtensions = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif", ".gif", ".svg"]);
 
@@ -263,6 +265,64 @@ async function restoreImage(fileName) {
   return readImageInfo(safeName);
 }
 
+async function readLogoInfo() {
+  await mkdir(imageAssetsPath, { recursive: true });
+  await syncLogoVersion();
+  if (!(await pathExists(getImagePublicPath(logoFileName)))) {
+    return { fileName: logoFileName, src: "", cleanSrc: `${imageRouteBase}/${logoFileName}`, backup: null };
+  }
+
+  return readImageInfo(logoFileName);
+}
+
+async function applyLogo(buffer) {
+  if (!buffer?.length) throw new Error("No se ha recibido ningún logo.");
+
+  await mkdir(imageAssetsPath, { recursive: true });
+  const logoPath = getImagePublicPath(logoFileName);
+  const backupName = getImageBackupName(logoFileName);
+  const backupPath = getImagePublicPath(backupName);
+  const hadLogo = await pathExists(logoPath);
+  const hadBackup = await pathExists(backupPath);
+
+  if (hadLogo && !hadBackup) {
+    await copyFile(logoPath, backupPath);
+  }
+
+  await saveLogoBuffer(buffer);
+  await syncImageToDist(logoFileName);
+  await syncImageToDist(backupName);
+  await syncImageVersions();
+  return readLogoInfo();
+}
+
+async function confirmLogo() {
+  const backupName = getImageBackupName(logoFileName);
+  const backupPath = getImagePublicPath(backupName);
+
+  if (await pathExists(backupPath)) await unlink(backupPath);
+  await syncImageToDist(backupName);
+  await syncLogoVersion();
+  await syncImageVersions();
+  return readLogoInfo();
+}
+
+async function restoreLogo() {
+  const logoPath = getImagePublicPath(logoFileName);
+  const backupName = getImageBackupName(logoFileName);
+  const backupPath = getImagePublicPath(backupName);
+
+  if (!(await pathExists(backupPath))) throw new Error("No hay copia OLD_ del logo para restaurar.");
+  if (await pathExists(logoPath)) await unlink(logoPath);
+  await rename(backupPath, logoPath);
+
+  await syncImageToDist(logoFileName);
+  await syncImageToDist(backupName);
+  await syncLogoVersion();
+  await syncImageVersions();
+  return readLogoInfo();
+}
+
 function getImageContentType(fileName) {
   const extension = extname(fileName).toLowerCase();
   if (extension === ".jpg" || extension === ".jpeg") return "image/jpeg";
@@ -416,7 +476,18 @@ function renderHtml() {
     .image-actions .wide { grid-column: 1 / -1; }
     .selected-file { min-height: 1.3rem; margin: 0; color: color-mix(in srgb, var(--ui-secondary) 84%, var(--ui-light)); font-size: 0.84rem; overflow-wrap: anywhere; }
     .empty-state { border: 1px solid var(--ui-line); padding: 1rem; color: color-mix(in srgb, var(--ui-light) 66%, transparent); }
+    .logo-panel { display: grid; grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.7fr); gap: 1rem; align-items: start; }
+    .logo-preview { border: 1px solid var(--ui-line); background: #151112; padding: 1rem; display: grid; gap: 1rem; }
+    .logo-stage { min-height: 15rem; display: grid; place-items: center; border: 1px solid var(--ui-line); background: radial-gradient(circle at 50% 25%, color-mix(in srgb, var(--ui-primary) 20%, transparent), transparent 16rem), #100c0d; padding: 1.2rem; }
+    .logo-stage img { display: block; width: min(100%, 34rem); height: auto; object-fit: contain; }
+    .logo-mini-row { display: grid; grid-template-columns: 9rem 1fr; gap: 1rem; align-items: center; }
+    .logo-mini { min-height: 5rem; display: grid; place-items: center; border: 1px solid var(--ui-line); background: #100c0d; padding: 0.8rem; }
+    .logo-mini img { display: block; max-width: 100%; max-height: 4rem; object-fit: contain; }
+    .logo-copy { display: grid; gap: 0.7rem; }
+    .logo-copy h2 { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(2.3rem, 6vw, 4.2rem); font-weight: 400; line-height: 0.95; }
+    .logo-copy p { margin: 0; color: color-mix(in srgb, var(--ui-light) 68%, transparent); }
     @media (max-width: 880px) { .hero, .layout, .color-grid, .image-grid { grid-template-columns: 1fr; } .preview { position: static; } }
+    @media (max-width: 880px) { .logo-panel { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -432,6 +503,7 @@ function renderHtml() {
     <nav class="tabs" aria-label="Secciones del editor">
       <button class="tab-button is-active" type="button" data-tab="colors">Colores</button>
       <button class="tab-button" type="button" data-tab="images">Imágenes</button>
+      <button class="tab-button" type="button" data-tab="logo">Logo</button>
       <a class="link-button" href="http://127.0.0.1:4321/" target="_blank" rel="noreferrer">Abrir web</a>
     </nav>
 
@@ -478,6 +550,39 @@ function renderHtml() {
       <p class="status" id="image-status" role="status" aria-live="polite"></p>
       <p class="note">Al aplicar una imagen, la anterior queda guardada como <code>OLD_nombre.ext</code>. Confirmar borra esa copia; restaurar recupera la anterior.</p>
     </section>
+
+    <section class="panel" id="tab-logo" hidden>
+      <div class="logo-panel">
+        <div class="logo-copy">
+          <p class="brand">ALMA / Logo</p>
+          <h2>Marca principal</h2>
+          <p>Este logo se usa en la cabecera, el menú móvil, el pie y el gran bloque ALMA del inicio. Al aplicar un logo nuevo, el anterior queda como <code>OLD_logo.png</code> hasta que confirmes o restaures.</p>
+          <input type="file" accept="image/*" hidden id="logo-file">
+          <p class="selected-file" id="logo-selected" aria-live="polite"></p>
+          <div class="actions">
+            <button class="secondary" type="button" id="logo-choose">Cambiar logo</button>
+            <button type="button" id="logo-apply" disabled>Aplicar</button>
+            <button class="secondary" type="button" id="logo-confirm" disabled>Confirmar</button>
+            <button class="secondary" type="button" id="logo-restore" disabled>Restaurar</button>
+          </div>
+          <p class="status" id="logo-status" role="status" aria-live="polite"></p>
+        </div>
+        <div class="logo-preview">
+          <div class="logo-stage"><img id="logo-preview-main" alt="Logo ALMA actual"></div>
+          <div class="logo-mini-row">
+            <div class="logo-mini"><img id="logo-preview-mini" alt=""></div>
+            <div>
+              <strong id="logo-name">logo.png</strong>
+              <p class="note" id="logo-path">/assets/images/alma/logo.png</p>
+            </div>
+          </div>
+          <div class="image-old" id="logo-old" hidden>
+            <div class="image-frame"><img id="logo-old-image" alt="Logo anterior de ALMA"></div>
+            <div><strong>Anterior disponible</strong><p>OLD_logo.png</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script>
@@ -492,10 +597,25 @@ function renderHtml() {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabColors = document.querySelector('#tab-colors');
     const tabImages = document.querySelector('#tab-images');
+    const tabLogo = document.querySelector('#tab-logo');
     const imageGrid = document.querySelector('#image-grid');
     const imageStatus = document.querySelector('#image-status');
     const imageReloadButton = document.querySelector('#image-reload');
     const selectedImages = new Map();
+    const logoFileInput = document.querySelector('#logo-file');
+    const logoChooseButton = document.querySelector('#logo-choose');
+    const logoApplyButton = document.querySelector('#logo-apply');
+    const logoConfirmButton = document.querySelector('#logo-confirm');
+    const logoRestoreButton = document.querySelector('#logo-restore');
+    const logoSelected = document.querySelector('#logo-selected');
+    const logoStatus = document.querySelector('#logo-status');
+    const logoPreviewMain = document.querySelector('#logo-preview-main');
+    const logoPreviewMini = document.querySelector('#logo-preview-mini');
+    const logoOld = document.querySelector('#logo-old');
+    const logoOldImage = document.querySelector('#logo-old-image');
+    const logoName = document.querySelector('#logo-name');
+    const logoPath = document.querySelector('#logo-path');
+    let selectedLogoFile = null;
 
     const cssVarMap = {
       '--alma-primary': '--ui-primary',
@@ -511,7 +631,9 @@ function renderHtml() {
       tabButtons.forEach((button) => button.classList.toggle('is-active', button.dataset.tab === tab));
       tabColors.hidden = tab !== 'colors';
       tabImages.hidden = tab !== 'images';
+      tabLogo.hidden = tab !== 'logo';
       if (tab === 'images') loadImages().catch((error) => { imageStatus.textContent = error.message; });
+      if (tab === 'logo') loadLogo().catch((error) => { logoStatus.textContent = error.message; });
     }
 
     function setPreviewValue(key, value) {
@@ -752,6 +874,70 @@ function renderHtml() {
       imageStatus.textContent = path.endsWith('/restore') ? 'Imagen restaurada.' : 'Cambio confirmado.';
     }
 
+    function renderLogo(logo) {
+      const src = logo.src || logo.cleanSrc || '/assets/images/alma/logo.png';
+      logoPreviewMain.src = src;
+      logoPreviewMini.src = src;
+      logoName.textContent = logo.fileName || 'logo.png';
+      logoPath.textContent = logo.cleanSrc || '/assets/images/alma/logo.png';
+      logoConfirmButton.disabled = !logo.backup;
+      logoRestoreButton.disabled = !logo.backup;
+
+      if (logo.backup) {
+        logoOld.hidden = false;
+        logoOldImage.src = logo.backup.src;
+      } else {
+        logoOld.hidden = true;
+        logoOldImage.removeAttribute('src');
+      }
+    }
+
+    async function loadLogo() {
+      logoStatus.textContent = 'Cargando logo...';
+      const response = await fetch('/api/logo', { cache: 'no-store' });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'No se pudo leer el logo.');
+      renderLogo(data.logo);
+      logoStatus.textContent = 'Logo cargado.';
+    }
+
+    async function applyLogo() {
+      if (!selectedLogoFile) {
+        logoStatus.textContent = 'Elige un logo antes de aplicar.';
+        return;
+      }
+
+      logoStatus.textContent = 'Aplicando logo...';
+      const response = await fetch('/api/logo/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': selectedLogoFile.type || 'application/octet-stream' },
+        body: await selectedLogoFile.arrayBuffer()
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        logoStatus.textContent = data.error || 'No se pudo aplicar el logo.';
+        return;
+      }
+      selectedLogoFile = null;
+      logoFileInput.value = '';
+      logoSelected.textContent = '';
+      logoApplyButton.disabled = true;
+      renderLogo(data.logo);
+      logoStatus.textContent = 'Logo aplicado. Recarga la web para verlo.';
+    }
+
+    async function postLogoAction(path) {
+      logoStatus.textContent = 'Actualizando logo...';
+      const response = await fetch(path, { method: 'POST' });
+      const data = await response.json();
+      if (!response.ok) {
+        logoStatus.textContent = data.error || 'No se pudo completar la acción.';
+        return;
+      }
+      renderLogo(data.logo);
+      logoStatus.textContent = path.endsWith('/restore') ? 'Logo restaurado.' : 'Cambio de logo confirmado.';
+    }
+
     tabButtons.forEach((button) => {
       button.addEventListener('click', () => activateTab(button.dataset.tab));
     });
@@ -776,6 +962,17 @@ function renderHtml() {
 
     reloadButton.addEventListener('click', () => loadTheme().catch((error) => { status.textContent = error.message; }));
     imageReloadButton.addEventListener('click', () => loadImages().catch((error) => { imageStatus.textContent = error.message; }));
+    logoChooseButton.addEventListener('click', () => logoFileInput.click());
+    logoFileInput.addEventListener('change', () => {
+      const file = logoFileInput.files && logoFileInput.files[0];
+      if (!file) return;
+      selectedLogoFile = file;
+      logoSelected.textContent = file.name;
+      logoApplyButton.disabled = false;
+    });
+    logoApplyButton.addEventListener('click', () => applyLogo());
+    logoConfirmButton.addEventListener('click', () => postLogoAction('/api/logo/confirm'));
+    logoRestoreButton.addEventListener('click', () => postLogoAction('/api/logo/restore'));
     loadTheme().catch((error) => { status.textContent = error.message; });
   </script>
 </body>
@@ -798,6 +995,35 @@ const server = createServer(async (request, response) => {
     if (request.method === "GET" && url.pathname === "/api/images") {
       const images = await listImages();
       return sendJson(response, 200, { imageRouteBase, imageAssetsPath, images });
+    }
+    if (request.method === "GET" && url.pathname === "/api/logo") {
+      const logo = await readLogoInfo();
+      return sendJson(response, 200, { logo });
+    }
+    if (request.method === "POST" && url.pathname === "/api/logo/apply") {
+      try {
+        const buffer = await readRequestBody(request);
+        const logo = await applyLogo(buffer);
+        return sendJson(response, 200, { logo });
+      } catch (error) {
+        return sendJson(response, 400, { error: error.message });
+      }
+    }
+    if (request.method === "POST" && url.pathname === "/api/logo/confirm") {
+      try {
+        const logo = await confirmLogo();
+        return sendJson(response, 200, { logo });
+      } catch (error) {
+        return sendJson(response, 400, { error: error.message });
+      }
+    }
+    if (request.method === "POST" && url.pathname === "/api/logo/restore") {
+      try {
+        const logo = await restoreLogo();
+        return sendJson(response, 200, { logo });
+      } catch (error) {
+        return sendJson(response, 400, { error: error.message });
+      }
     }
     if (request.method === "POST" && url.pathname === "/api/images/apply") {
       try {
@@ -857,12 +1083,14 @@ function openBrowser(url) {
 }
 
 function listen(port) {
+  server.removeAllListeners("error");
+  server.removeAllListeners("listening");
   server.once("error", (error) => {
     if (error.code === "EADDRINUSE" && port < 4999) return listen(port + 1);
     console.error(error);
     process.exit(1);
   });
-  server.listen(port, "127.0.0.1", () => {
+  server.once("listening", () => {
     const url = `http://127.0.0.1:${port}/`;
     console.log("ALMA · Editor visual");
     console.log(`Archivo: ${themePath}`);
@@ -870,6 +1098,7 @@ function listen(port) {
     console.log("Cierra esta ventana para apagar el editor.");
     openBrowser(url);
   });
+  server.listen(port, "127.0.0.1");
 }
 
 listen(4387);

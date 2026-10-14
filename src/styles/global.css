@@ -268,9 +268,16 @@ main {
 }
 
 .brand-mark {
-  font-family: var(--font-serif);
-  font-size: 2rem;
-  letter-spacing: 0.08em;
+  display: block;
+  width: clamp(4.8rem, 7vw, 6.8rem);
+  line-height: 0;
+}
+
+.brand-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .brand-sub {
@@ -557,6 +564,18 @@ main {
   font-weight: 400;
   line-height: 0.78;
   letter-spacing: 0.04em;
+}
+
+.hero-logo-title {
+  width: min(32rem, 82vw);
+  line-height: 0;
+}
+
+.hero-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .hero-claim {
@@ -1583,8 +1602,8 @@ html.has-js .home-hero .reveal-mask img {
     padding-top: 8rem;
   }
 
-  .hero-title {
-    font-size: 7rem;
+  .hero-logo-title {
+    width: min(27rem, 82vw);
   }
 
   .hero-media-wrap {
@@ -1620,7 +1639,7 @@ html.has-js .home-hero .reveal-mask img {
   }
 
   .brand-mark {
-    font-size: 1.65rem;
+    width: clamp(4.2rem, 18vw, 5.8rem);
   }
 
   .brand-sub {
@@ -1651,8 +1670,8 @@ html.has-js .home-hero .reveal-mask img {
     padding: 7.5rem 1rem 3rem;
   }
 
-  .hero-title {
-    font-size: 4.7rem;
+  .hero-logo-title {
+    width: min(22rem, 88vw);
   }
 
   .hero-claim,

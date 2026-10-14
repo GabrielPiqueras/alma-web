@@ -1,14 +1,16 @@
 ---
+import { versionedLogo } from "../data/logo";
 import { contact, navItems, siteMeta } from "../data/site";
 
 const year = new Date().getFullYear();
+const logoSrc = versionedLogo();
 ---
 
 <footer class="site-footer">
   <div class="footer-grid">
     <div class="footer-brand">
       <a class="brand is-footer" href="/">
-        <span class="brand-mark">{siteMeta.name}</span>
+        <span class="brand-mark"><img class="brand-logo" src={logoSrc} alt={siteMeta.name} /></span>
         <span class="brand-sub">{siteMeta.descriptor}</span>
       </a>
       <p>
