@@ -20,6 +20,7 @@ export const contact = {
 };
 
 export const navItems = [
+  { href: "/", label: "Inicio" },
   { href: "/escuela", label: "Escuela" },
   { href: "/formacion", label: "Formación" },
   { href: "/equipo", label: "Equipo" },
