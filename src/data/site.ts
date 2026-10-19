@@ -45,6 +45,8 @@ export const imageLibrary = {
     "/assets/images/alma/editorial-portrait.jpg",
   backstage:
     "/assets/images/alma/backstage.jpg",
+  esatur:
+    "/assets/images/alma/esatur.jpg",
   imagen:
     "/assets/images/alma/derechos-imagen.jpg",
   detail:

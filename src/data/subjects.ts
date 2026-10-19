@@ -65,8 +65,8 @@ export const academicProgram = {
       "items": []
     },
     {
-      "title": "Revisión del programa",
-      "description": "Este documento es una propuesta curricular detallada para planificación y coordinación docente. Antes de publicarlo como programa definitivo, conviene revisar cada ficha con el profesor correspondiente y confirmar el alcance de las sesiones, calendario, criterios de evaluación, materiales y protocolos de prácticas.",
+      "title": "Organización del programa",
+      "description": "Este apartado presenta el programa académico de ALMA. El contenido de las sesiones, el calendario, los criterios de evaluación, los materiales y las condiciones de las prácticas se concretarán con el equipo docente.",
       "items": []
     }
   ]

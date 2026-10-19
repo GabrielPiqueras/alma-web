@@ -22,6 +22,12 @@ export const gallery: GalleryImage[] = [
     shape: "landscape"
   },
   {
+    src: imageLibrary.esatur,
+    alt: "Esatur",
+    label: "Esatur",
+    shape: "esatur"
+  },
+  {
     src: "/assets/images/alma/gallery-styling.jpg",
     alt: "Perchero con prendas de moda en estudio",
     label: "Estilismo",
