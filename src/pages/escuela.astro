@@ -72,17 +72,16 @@ import { collaborator, imageLibrary, institutionalCopy } from "../data/site";
 
   <section class="section editorial-story">
     <div class="sticky-copy">
-      <p class="eyebrow">Colaboración integrada</p>
-      <h2>{collaborator.name}</h2>
-      <p>{collaborator.description}</p>
-      <strong>{collaborator.replaceNote}</strong>
+      <p class="eyebrow">{collaborator.label}</p>
+      <h2>{collaborator.title}</h2>
+      {collaborator.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
     </div>
     <EditorialImage src={imageLibrary.backstage} alt="Backstage de moda con prendas" ratio="landscape" parallax />
   </section>
 
   <CTA
-    title="El programa completo ya está estructurado."
-    text="Revisa las asignaturas, objetivos y responsables docentes de esta primera versión demo."
+    title="Conoce el programa académico de ALMA."
+    text="Revisa las once asignaturas, sus contenidos, actividades y profesorado responsable."
     href="/formacion"
     label="Ver formación"
   />

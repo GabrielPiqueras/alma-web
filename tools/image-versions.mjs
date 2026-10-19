@@ -5,24 +5,28 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = dirname(__dirname);
-const imageAssetsPath = join(projectRoot, "public", "assets", "images", "alma");
+const imageAssetsPath = join(projectRoot, "public", "assets", "images");
 const outputPath = join(projectRoot, "src", "data", "imageVersions.ts");
 const oldImagePrefix = "OLD_";
 const allowedImageExtensions = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif", ".gif", ".svg"]);
 
-async function getVersionedImages() {
-  await mkdir(imageAssetsPath, { recursive: true });
-  const entries = await readdir(imageAssetsPath, { withFileTypes: true });
+async function getVersionedImages(directory = imageAssetsPath, prefix = "") {
+  await mkdir(directory, { recursive: true });
+  const entries = await readdir(directory, { withFileTypes: true });
   const images = [];
 
   for (const entry of entries) {
-    if (!entry.isFile()) continue;
     if (entry.name.startsWith(oldImagePrefix)) continue;
+    if (entry.isDirectory()) {
+      images.push(...await getVersionedImages(join(directory, entry.name), `${prefix}${entry.name}/`));
+      continue;
+    }
+    if (!entry.isFile()) continue;
     if (!allowedImageExtensions.has(extname(entry.name).toLowerCase())) continue;
 
-    const buffer = await readFile(join(imageAssetsPath, entry.name));
+    const buffer = await readFile(join(directory, entry.name));
     const version = createHash("sha1").update(buffer).digest("hex").slice(0, 12);
-    images.push([entry.name, version]);
+    images.push([`${prefix}${entry.name}`, version]);
   }
 
   return images.sort(([a], [b]) => a.localeCompare(b, "es"));
@@ -43,8 +47,8 @@ function renderImageVersions(images) {
     "",
     "export function versionedImage(src: string) {",
     "  const [path] = src.split(\"?\");",
-    "  if (!path.startsWith(\"/assets/images/alma/\")) return src;",
-    "  const fileName = path.split(\"/\").pop() ?? \"\";",
+    "  if (!path.startsWith(\"/assets/images/\")) return src;",
+    "  const fileName = path.slice(\"/assets/images/\".length);",
     "  const version = imageVersions[fileName as keyof typeof imageVersions];",
     "  return version ? `${path}?v=${version}` : src;",
     "}",

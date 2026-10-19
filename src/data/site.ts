@@ -1,11 +1,11 @@
-// DEMO: Todo el contenido de este archivo es ficticio y está preparado para ser reemplazado.
+// Contenido facilitado por ALMA. Los datos de contacto pendientes siguen identificados como demo.
 export const siteMeta = {
   name: "ALMA",
   descriptor: "Escuela & Agencia de Imagen",
   url: "https://alma-demo.example",
   defaultTitle: "ALMA — Escuela & Agencia de Imagen",
   defaultDescription:
-    "Proyecto demo de escuela de modelaje y agencia de imagen con formación, equipo docente, desarrollo de talento y contacto.",
+    "Escuela de modelaje y agencia de imagen con formación, equipo docente, desarrollo de talento y contacto.",
   locale: "es_ES"
 };
 
@@ -38,52 +38,48 @@ export const imageLibrary = {
   agencia:
     "/assets/images/alma/agency-editorial.jpg",
   founder:
-    "/assets/images/alma/founder.jpg",
+    "/assets/images/personal/eliana-herrero-alma.jpg",
   project:
     "/assets/images/alma/editorial-portrait.jpg",
   contact:
     "/assets/images/alma/editorial-portrait.jpg",
   backstage:
     "/assets/images/alma/backstage.jpg",
+  imagen:
+    "/assets/images/alma/derechos-imagen.jpg",
   detail:
     "/assets/images/alma/beauty-portrait.jpg",
-  teacherAitana:
-    "/assets/images/alma/teacher-aitana.jpg",
-  teacherMateo:
-    "/assets/images/alma/teacher-mateo.jpg",
-  teacherInes:
-    "/assets/images/alma/teacher-ines.jpg",
-  teacherDiego:
-    "/assets/images/alma/teacher-diego.jpg",
-  teacherNoa:
-    "/assets/images/alma/teacher-noa.jpg",
-  teacherValeria:
-    "/assets/images/alma/teacher-valeria.jpg",
-  teacherMarta:
-    "/assets/images/alma/teacher-marta.jpg",
-  teacherElena:
-    "/assets/images/alma/teacher-elena.jpg"
 };
 
 export const founder = {
-  // DEMO: identidad ficticia de la promotora/fundadora.
-  slug: "clara-montes",
-  name: "Clara Montes Vidal",
-  role: "Fundadora y dirección de ALMA",
-  image: imageLibrary.founder,
-  bio:
-    "Clara inicia ALMA después de más de una década acompañando perfiles emergentes en sesiones editoriales, castings y proyectos de imagen. Su enfoque une técnica, criterio visual y una forma cercana de preparar a cada persona para trabajar con seguridad delante de una cámara, en una pasarela o en una reunión profesional.",
-  vision:
-    "ALMA nace para formar presencia, no solo apariencia: una escuela donde la imagen se trabaja con método, sensibilidad y conciencia profesional."
+  "slug": "eliana-herrero",
+  "name": "Eliana Herrero",
+  "role": "Fundadora y directora de ALMA · Escuela & Agencia de Imagen",
+  "image": "/assets/images/personal/eliana-herrero-alma.jpg",
+  "bio": "Mi nombre es Eliana Herrero y soy la fundadora y directora de ALMA, un proyecto que nace de mi pasión por la moda, la imagen y, sobre todo, por el potencial que tiene cada persona para convertir su esencia en una oportunidad.",
+  "vision": "Todo gran proyecto comienza con un sueño. ALMA nació del mío.",
+  "story": [
+    "Mi nombre es Eliana Herrero y soy la fundadora y directora de ALMA, un proyecto que nace de mi pasión por la moda, la imagen y, sobre todo, por el potencial que tiene cada persona para convertir su esencia en una oportunidad.",
+    "Mi camino comenzó desde la propia experiencia. He realizado tres formaciones como modelo, dos en agencias de Madrid y una en Alicante, que me permitieron conocer de cerca el mundo de la moda, sus exigencias, sus oportunidades y todo lo que existe detrás de una imagen profesional. A lo largo de mi trayectoria también he participado en experiencias vinculadas a la publicidad, los desfiles, los castings y los eventos, descubriendo un sector que terminó convirtiéndose en mucho más que una pasión: en mi propósito.",
+    "Con el tiempo, aquel sueño fue tomando forma. Empecé a imaginar un espacio diferente, donde la formación no terminara al salir del aula, sino que pudiera abrir puertas hacia el mundo profesional. Un lugar donde cada alumno encontrara herramientas, confianza y orientación para descubrir sus capacidades y aprender a proyectarlas al exterior.",
+    "Así nació ALMA.",
+    "Detrás de este proyecto hay mucho más que una idea: hay horas de dedicación, formación, planificación, investigación y trabajo. Me he implicado tanto profesional como personalmente en cada detalle, construyendo una estructura que une escuela y agencia con una visión clara: formar personas, impulsar talento y acercar oportunidades reales.",
+    "Creo profundamente que la imagen va mucho más allá de lo que vemos. Habla de seguridad, identidad, actitud y autenticidad. Por eso, mi propósito no es únicamente enseñar a desfilar o posar ante una cámara, sino acompañar a cada persona en el desarrollo de su potencial y en la construcción de su propio camino profesional.",
+    "ALMA representa todo lo que he aprendido, todo lo que he soñado y todo aquello por lo que he trabajado para hacerlo realidad. Es el comienzo de un camino que quiero recorrer junto a profesionales que compartan esta visión y alumnos que estén dispuestos a descubrir hasta dónde pueden llegar.",
+    "Porque a veces un sueño empieza siendo solo una idea, pero cuando se acompaña de compromiso, esfuerzo y pasión, puede convertirse en algo capaz de inspirar a otros.",
+    "ALMA es mi sueño convertido en proyecto. Y mi mayor ilusión es que también se convierta en el comienzo de muchas historias profesionales."
+  ]
 };
 
 export const collaborator = {
-  // DEMO: empresa colaboradora ficticia. Sustituir por la empresa real.
-  name: "Nébula Atelier Studio",
-  label: "Colaboración inicial demo",
-  description:
-    "Estudio creativo independiente que acompaña la primera fase de ALMA en producción fotográfica, dirección de arte y creación de books de presentación. Su papel aparece integrado en la metodología, no como una marca protagonista del proyecto.",
-  replaceNote: "DEMO / REEMPLAZAR POR EMPRESA COLABORADORA REAL"
+  "name": "ESATUR",
+  "label": "ALMA × ESATUR",
+  "title": "Formación, talento y oportunidades reales",
+  "paragraphs": [
+    "ESATUR es una entidad especializada en formación y experiencias profesionales vinculadas al turismo, los eventos y el sector empresarial. A través de nuestra colaboración, ALMA busca conectar la formación en moda e imagen con el mundo profesional, acercando a nuestros alumnos a experiencias prácticas y al entorno de los eventos.",
+    "Esta sinergia abre la puerta a nuevas oportunidades en ferias, congresos, promociones de marca, eventos corporativos, atención al público y acciones publicitarias, desarrollando perfiles versátiles, preparados y con una imagen profesional.",
+    "En ALMA creemos que el talento no solo se forma: se impulsa, se proyecta y se convierte en oportunidades."
+  ]
 };
 
 export const institutionalCopy = {
@@ -107,11 +103,11 @@ export const faqs = [
   {
     question: "¿La agencia garantiza trabajos o castings?",
     answer:
-      "No se prometen resultados cerrados en esta demo. La vertiente de agencia está planteada como acompañamiento, preparación de material y conexión con oportunidades cuando el perfil encaja."
+      "La formación no garantiza representación ni contratación. Las oportunidades dependen del perfil, la preparación, la disponibilidad, los requisitos del cliente y la existencia de encargos adecuados; cualquier relación con la agencia se formaliza de forma independiente."
   },
   {
-    question: "¿Los datos del equipo y la empresa colaboradora son reales?",
+    question: "¿Quién forma el equipo y qué colaboración tiene ALMA?",
     answer:
-      "No. Los nombres, perfiles, teléfonos, email, empresa colaboradora y biografías son contenido DEMO para presentar el proyecto de forma completa."
+      "Eliana Herrero es la fundadora y directora de ALMA. El equipo reúne a once docentes especializados en moda, imagen, fotografía, comunicación y otras áreas del programa. La colaboración ALMA × ESATUR busca conectar esta formación con experiencias prácticas y el entorno de los eventos."
   }
 ];

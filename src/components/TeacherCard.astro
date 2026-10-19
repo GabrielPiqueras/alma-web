@@ -20,9 +20,9 @@ const teacherImage = versionedImage(teacher.image);
       <img src={teacherImage} alt={teacher.alt} loading="lazy" decoding="async" />
     </div>
     <div class="teacher-body">
-      <p>{teacher.specialty}</p>
+      <p>{teacher.role}</p>
       <h3 style={`view-transition-name:teacher-name-${teacher.slug}`}>{teacher.name}</h3>
-      <span>{teacher.role}</span>
+      <span>{teacher.bio}</span>
       <span class="text-link">Ficha <span aria-hidden="true">→</span></span>
     </div>
   </a>

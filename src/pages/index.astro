@@ -20,7 +20,7 @@ const logoSrc = versionedLogo();
 
 <BaseLayout
   title="ALMA — Escuela & Agencia de Imagen"
-  description="Demo profesional de ALMA, una escuela de modelaje y agencia de imagen con formación, equipo docente, agencia y proyecto empresarial."
+  description="ALMA, escuela de modelaje y agencia de imagen con formación, equipo docente, agencia y proyecto empresarial."
   image={imageLibrary.hero}
   pageClass="home-page"
 >
@@ -45,7 +45,7 @@ const logoSrc = versionedLogo();
       <span class="vertical-label">Formación / Imagen / Talento</span>
       <EditorialImage
         src={imageLibrary.hero}
-        alt="Retrato editorial de moda para la demo de ALMA"
+        alt="Retrato editorial de moda para ALMA"
         ratio="portrait"
         class="hero-media"
         eager
@@ -53,7 +53,7 @@ const logoSrc = versionedLogo();
       />
       <div class="hero-note">
         <span>2026</span>
-        <p>Programa demo para presentar el proyecto empresarial.</p>
+        <p>Tu esencia, tu imagen, tu profesión.</p>
       </div>
     </div>
   </section>
@@ -70,8 +70,8 @@ const logoSrc = versionedLogo();
         <span>01 — Escuela</span>
         <h3>Formación integral para moverse con seguridad en imagen, moda y cámara.</h3>
         <p>
-          Un programa organizado por asignaturas reales: pasarela, posado, expresión,
-          comunicación, estilismo, protocolo, redes y bienestar profesional.
+          Once asignaturas de pasarela, fotografía, imagen, redes, casting, interpretación,
+          diseño, maquillaje, marketing y relaciones profesionales.
         </p>
       </article>
       <article class="pillar js-reveal">
@@ -113,9 +113,9 @@ const logoSrc = versionedLogo();
 
   <section class="section team-preview">
     <SectionHeading
-      eyebrow="Equipo docente demo"
+      eyebrow="Equipo docente"
       title="Profesionales de cámara, | movimiento e imagen"
-      lead="El equipo combina perfiles de pasarela, fotografía, interpretación, comunicación, estilismo, maquillaje y bienestar aplicado al sector."
+      lead="Once docentes especializados en las áreas del programa, con Eliana Herrero al frente de la dirección de ALMA."
       number="03"
     />
     <div class="teacher-rail">
@@ -145,7 +145,7 @@ const logoSrc = versionedLogo();
   <section class="section founder-section">
     <EditorialImage
       src={founder.image}
-      alt="Retrato de la fundadora demo de ALMA"
+      alt="Retrato de Eliana Herrero, fundadora y directora de ALMA"
       ratio="portrait"
       class="founder-image"
       parallax
@@ -153,6 +153,7 @@ const logoSrc = versionedLogo();
     <div class="founder-copy js-reveal">
       <p class="eyebrow">Fundadora</p>
       <h2>{founder.name}</h2>
+      <p>{founder.role}</p>
       <p>{founder.bio}</p>
       <blockquote>{founder.vision}</blockquote>
       <a class="text-link" href="/proyecto">Leer historia del proyecto <span aria-hidden="true">→</span></a>
@@ -161,12 +162,8 @@ const logoSrc = versionedLogo();
 
   <section class="collab-strip js-reveal">
     <span>{collaborator.label}</span>
-    <h2>Un proyecto construido en colaboración.</h2>
-    <p>
-      {collaborator.name} participa como estudio creativo de apoyo en esta primera
-      versión demo: producción visual, dirección de arte y preparación de material.
-      <strong>{collaborator.replaceNote}</strong>
-    </p>
+    <h2>{collaborator.title}</h2>
+    {collaborator.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
   </section>
 
   <section class="section gallery-section is-dark">

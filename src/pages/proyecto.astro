@@ -8,7 +8,7 @@ import { collaborator, founder, imageLibrary } from "../data/site";
 
 <BaseLayout
   title="Historia, filosofía y fundadora"
-  description="Historia demo del proyecto ALMA, filosofía de formación, fundadora y colaboración inicial integrada."
+  description="La historia de ALMA contada por Eliana Herrero, su fundadora y directora, y la colaboración ALMA × ESATUR."
   image={founder.image}
 >
   <section class="page-hero">
@@ -19,20 +19,28 @@ import { collaborator, founder, imageLibrary } from "../data/site";
         <span data-line>a ocupar una imagen con intención.</span>
       </h1>
     </div>
-    <p>
-      ALMA se presenta como un proyecto empresarial ya estructurado: escuela,
-      agencia, equipo, metodología, colaboración inicial y una identidad visual lista
-      para crecer con datos reales.
-    </p>
+    <p>{founder.vision}</p>
   </section>
 
   <section class="section founder-section">
-    <EditorialImage src={founder.image} alt="Retrato de Clara Montes, fundadora demo" ratio="portrait" parallax />
+    <EditorialImage src={founder.image} alt="Retrato de Eliana Herrero, fundadora y directora de ALMA" ratio="portrait" parallax />
     <div class="founder-copy js-reveal">
-      <p class="eyebrow">Fundadora demo</p>
+      <p class="eyebrow">Fundadora y directora</p>
       <h2>{founder.name}</h2>
+      <p>{founder.role}</p>
       <p>{founder.bio}</p>
       <blockquote>{founder.vision}</blockquote>
+    </div>
+  </section>
+
+  <section class="section profile-body">
+    <div class="quote-panel js-reveal">
+      <p class="eyebrow">Eliana Herrero</p>
+      <blockquote>Así nació ALMA.</blockquote>
+    </div>
+    <div class="experience-panel stacked-copy js-reveal">
+      <p class="eyebrow">Mi historia</p>
+      {founder.story.slice(1).map((paragraph) => <p>{paragraph}</p>)}
     </div>
   </section>
 
@@ -64,22 +72,16 @@ import { collaborator, founder, imageLibrary } from "../data/site";
 
   <section class="section two-column reversed">
     <div class="stacked-copy js-reveal">
-      <p class="eyebrow">Colaboración inicial</p>
-      <h2>{collaborator.name}</h2>
-      <p>{collaborator.description}</p>
-      <strong>{collaborator.replaceNote}</strong>
-      <p>
-        La colaboración se integra en la historia del proyecto como apoyo técnico y
-        creativo para la primera etapa: producción, dirección de arte y preparación
-        de materiales visuales.
-      </p>
+      <p class="eyebrow">{collaborator.label}</p>
+      <h2>{collaborator.title}</h2>
+      {collaborator.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
     </div>
     <EditorialImage src={imageLibrary.project} alt="Retrato editorial de proyecto ALMA" ratio="portrait" parallax />
   </section>
 
   <CTA
-    title="El proyecto ya tiene una narrativa completa."
-    text="Formación, equipo, agencia, fundadora, colaboración y contacto quedan preparados para presentar la demo."
+    title="Tu esencia, tu imagen, tu profesión."
+    text="Conoce la formación de ALMA y consulta cómo comenzar tu recorrido."
     href="/contacto"
     label="Solicitar información"
   />

@@ -4,6 +4,7 @@ import CTA from "../../components/CTA.astro";
 import EditorialImage from "../../components/EditorialImage.astro";
 import SubjectCard from "../../components/SubjectCard.astro";
 import { subjects } from "../../data/subjects";
+import { founder } from "../../data/site";
 import { teachers, type Teacher } from "../../data/teachers";
 
 export function getStaticPaths() {
@@ -19,7 +20,7 @@ const relatedSubjects = subjects.filter((subject) => teacher.subjectSlugs.includ
 
 <BaseLayout
   title={`${teacher.name} — Equipo`}
-  description={`${teacher.name}, ${teacher.role} en ALMA. ${teacher.specialty}.`}
+  description={`${teacher.name}. ${teacher.bio}`}
   image={teacher.image}
   jsonLd={[
     {
@@ -34,14 +35,13 @@ const relatedSubjects = subjects.filter((subject) => teacher.subjectSlugs.includ
 >
   <section class="detail-hero teacher-detail">
     <div class="detail-copy">
-      <p class="eyebrow">{teacher.isFounder ? "Dirección / Fundadora" : "Equipo docente demo"}</p>
+      <p class="eyebrow">{teacher.isFounder ? "Dirección / Fundadora" : "Equipo docente"}</p>
       <h1 class="split-lines" style={`view-transition-name:teacher-name-${teacher.slug}`}>
         <span data-line>{teacher.name}</span>
       </h1>
       <p>{teacher.bio}</p>
       <div class="detail-meta">
         <span>{teacher.role}</span>
-        <span>{teacher.specialty}</span>
       </div>
     </div>
     <EditorialImage
@@ -56,18 +56,18 @@ const relatedSubjects = subjects.filter((subject) => teacher.subjectSlugs.includ
 
   <section class="section profile-body">
     <div class="quote-panel js-reveal">
-      <p class="eyebrow">Mirada docente</p>
-      <blockquote>{teacher.quote}</blockquote>
-      {teacher.social && <span>{teacher.social}</span>}
+      <p class="eyebrow">{teacher.isFounder ? "El origen de ALMA" : "Área de especialización"}</p>
+      {teacher.isFounder ? <blockquote>{founder.vision}</blockquote> : <p>{teacher.role}</p>}
     </div>
-    <div class="experience-panel js-reveal">
-      <p class="eyebrow">Experiencia demo</p>
-      <ul class="check-list">
-        {teacher.experience.map((item) => <li>{item}</li>)}
-      </ul>
+    <div class="experience-panel stacked-copy js-reveal">
+      <p class="eyebrow">{teacher.isFounder ? "Mi historia" : "Formación en ALMA"}</p>
+      {teacher.isFounder
+        ? founder.story.slice(1).map((paragraph) => <p>{paragraph}</p>)
+        : relatedSubjects.map((subject) => <p>{subject.description}</p>)}
     </div>
   </section>
 
+  {relatedSubjects.length > 0 && (
   <section class="section related-section">
     <div class="section-inline-heading">
       <p class="eyebrow">Asignaturas vinculadas</p>
@@ -78,9 +78,11 @@ const relatedSubjects = subjects.filter((subject) => teacher.subjectSlugs.includ
     </div>
   </section>
 
+  )}
+
   <CTA
     title="Volver al equipo docente."
-    text="Consulta todos los perfiles demo que construyen la metodología ALMA."
+    text="Consulta los once perfiles docentes del programa de ALMA."
     href="/equipo"
     label="Ver equipo"
   />

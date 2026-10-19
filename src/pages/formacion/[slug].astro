@@ -4,7 +4,7 @@ import CTA from "../../components/CTA.astro";
 import EditorialImage from "../../components/EditorialImage.astro";
 import SubjectCard from "../../components/SubjectCard.astro";
 import TeacherCard from "../../components/TeacherCard.astro";
-import { subjects, type Subject } from "../../data/subjects";
+import { academicProgram, subjects, type Subject } from "../../data/subjects";
 import { teachers } from "../../data/teachers";
 
 export function getStaticPaths() {
@@ -38,7 +38,7 @@ const relatedSubjects = subjects.filter((item) => item.slug !== subject.slug).sl
 >
   <section class="detail-hero">
     <div class="detail-copy">
-      <p class="eyebrow">{subject.number} / Asignatura demo</p>
+      <p class="eyebrow">{subject.number} / Asignatura</p>
       <h1 class="split-lines" style={`view-transition-name:subject-title-${subject.slug}`}>
         <span data-line>{subject.title}</span>
       </h1>
@@ -60,7 +60,7 @@ const relatedSubjects = subjects.filter((item) => item.slug !== subject.slug).sl
 
   <section class="section detail-grid">
     <div class="detail-panel js-reveal">
-      <p class="eyebrow">Objetivos</p>
+      <p class="eyebrow">Resultados de aprendizaje esperados</p>
       <ul class="check-list">
         {subject.objectives.map((objective) => <li>{objective}</li>)}
       </ul>
@@ -72,8 +72,15 @@ const relatedSubjects = subjects.filter((item) => item.slug !== subject.slug).sl
       </ul>
     </div>
     <div class="detail-panel is-wide js-reveal">
-      <p class="eyebrow">Metodología</p>
-      <p>{subject.methodology}</p>
+      <p class="eyebrow">Actividades prácticas orientativas</p>
+      <ul class="check-list">
+        {subject.activities.map((activity) => <li>{activity}</li>)}
+      </ul>
+    </div>
+    <div class="detail-panel is-wide js-reveal">
+      <p class="eyebrow">Metodología formativa</p>
+      <p>{academicProgram.sections[0].description}</p>
+      <p>{academicProgram.detailNote}</p>
     </div>
   </section>
 
