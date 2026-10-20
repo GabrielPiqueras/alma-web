@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { subjects } from "../data/subjects";
 import { teachers } from "../data/teachers";
+import { seoSettings, canonicalPageUrl, pageIsIndexable, escapeXml } from "../data/seo";
 
 const staticPages = [
   "",
@@ -16,17 +17,19 @@ const staticPages = [
   "privacidad"
 ];
 
-export const GET: APIRoute = ({ site }) => {
-  const base = site?.toString() ?? "https://alma-demo.example/";
-  const urls = [
-    ...staticPages.map((page) => new URL(page, base).toString()),
-    ...subjects.map((subject) => new URL(`formacion/${subject.slug}`, base).toString()),
-    ...teachers.map((teacher) => new URL(`equipo/${teacher.slug}`, base).toString())
+export const GET: APIRoute = () => {
+  const paths = [
+    ...staticPages.map(page => `/${page}`),
+    ...subjects.map(subject => `/formacion/${subject.slug}`),
+    ...teachers.map(teacher => `/equipo/${teacher.slug}`)
   ];
+  const urls = paths
+    .filter(path => pageIsIndexable(seoSettings, path))
+    .map(path => canonicalPageUrl(seoSettings.siteUrl, path));
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((url) => `  <url><loc>${url}</loc></url>`).join("\n")}
+${urls.map((url) => `  <url><loc>${escapeXml(url)}</loc></url>`).join("\n")}
 </urlset>`;
 
   return new Response(xml, {

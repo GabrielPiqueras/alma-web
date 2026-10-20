@@ -1,6 +1,6 @@
 ---
 import { versionedLogo } from "../data/logo";
-import { navItems, siteMeta } from "../data/site";
+import { contact, navItems, siteMeta } from "../data/site";
 
 const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
 const isActive = (href: string) => {
@@ -69,7 +69,7 @@ const logoSrc = versionedLogo();
       </nav>
       <div class="mobile-menu-meta">
         <span>ALMA / Escuela & Agencia</span>
-        <a href="mailto:hola@almaimagen.demo">hola@almaimagen.demo</a>
+        {contact.email && <a href={`mailto:${contact.email}`}>{contact.email}</a>}
       </div>
     </div>
   </div>

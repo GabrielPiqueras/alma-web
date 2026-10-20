@@ -1,20 +1,17 @@
-// Contenido facilitado por ALMA. Los datos de contacto pendientes siguen identificados como demo.
+import { seoSettings } from "./seo";
+
+// Datos públicos editables desde Editar colores ALMA.bat > SEO y datos.
 export const siteMeta = {
-  name: "ALMA",
+  name: seoSettings.siteName,
   descriptor: "Escuela & Agencia de Imagen",
-  url: "https://alma-demo.example",
-  defaultTitle: "ALMA — Escuela & Agencia de Imagen",
-  defaultDescription:
-    "Escuela de modelaje y agencia de imagen con formación, equipo docente, desarrollo de talento y contacto.",
+  url: seoSettings.siteUrl,
+  defaultTitle: seoSettings.defaultTitle,
+  defaultDescription: seoSettings.defaultDescription,
   locale: "es_ES"
 };
 
 export const contact = {
-  // DEMO: sustituir por datos reales cuando existan.
-  email: "hola@almaimagen.demo",
-  phone: "+34 600 123 456",
-  city: "Madrid",
-  instagram: "@alma.imagen.demo",
+  ...seoSettings.contact,
   formEndpoint: "",
   formMode: "demo"
 };

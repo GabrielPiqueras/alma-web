@@ -7,5 +7,6 @@ if errorlevel 1 (
   pause
   exit /b 1
 )
+echo ALMA - Colores, imagenes, logo y SEO
 node tools\theme-editor.mjs
 pause

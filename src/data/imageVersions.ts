@@ -9,6 +9,7 @@ export const imageVersions = {
   "alma/beauty-portrait.jpg": "b713b2a697e3",
   "alma/derechos-imagen.jpg": "251564b5e115",
   "alma/editorial-portrait.jpg": "2097ebb5d3ab",
+  "alma/esatur.jpg": "ccf65f0b6d6b",
   "alma/founder.jpg": "c9ea08651007",
   "alma/gallery-portrait.jpg": "be4a5918a422",
   "alma/gallery-set.jpg": "6c766970a9d8",

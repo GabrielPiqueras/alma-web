@@ -7,12 +7,12 @@ import { contact, imageLibrary } from "../data/site";
 
 <BaseLayout
   title="Contacto"
-  description="Contacto demo de ALMA para solicitar información sobre formación, agencia, colaboración o presentación del proyecto."
+  description="Contacto de ALMA para solicitar información sobre formación, agencia, colaboración o presentación del proyecto."
   image={imageLibrary.contact}
 >
   <section class="page-hero">
     <div>
-      <p class="eyebrow">Contacto demo</p>
+      <p class="eyebrow">Contacto</p>
       <h1 class="split-lines">
         <span data-line>Hablemos de ALMA</span>
         <span data-line>y de cómo presentarlo con criterio.</span>
@@ -27,12 +27,13 @@ import { contact, imageLibrary } from "../data/site";
     <div class="contact-aside">
       <EditorialImage src={imageLibrary.contact} alt="Retrato editorial para página de contacto" ratio="portrait" parallax />
       <div class="contact-data js-reveal">
-        <p class="eyebrow">Datos demo</p>
-        <a href={`mailto:${contact.email}`}>{contact.email}</a>
-        <a href={`tel:${contact.phone.replaceAll(" ", "")}`}>{contact.phone}</a>
-        <span>{contact.instagram}</span>
-        <span>{contact.city}</span>
-        <p>Estos datos son ficticios y deben reemplazarse antes de publicar una versión real.</p>
+        <p class="eyebrow">Datos de contacto</p>
+        {contact.email && <a href={`mailto:${contact.email}`}>{contact.email}</a>}
+        {contact.phone && <a href={`tel:${contact.phone.replaceAll(" ", "")}`}>{contact.phone}</a>}
+        {contact.instagram && <a href={`https://www.instagram.com/${contact.instagram.replace("@", "")}/`} target="_blank" rel="noreferrer">{contact.instagram}</a>}
+        {contact.streetAddress && <span>{contact.streetAddress}</span>}
+        {(contact.postalCode || contact.city) && <span>{[contact.postalCode, contact.city].filter(Boolean).join(" ")}</span>}
+        {(contact.region || contact.country) && <span>{[contact.region, contact.country].filter(Boolean).join(", ")}</span>}
       </div>
     </div>
     <div class="contact-panel js-reveal">

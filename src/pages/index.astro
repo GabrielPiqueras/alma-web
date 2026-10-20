@@ -10,7 +10,7 @@ import { gallery } from "../data/gallery";
 import { versionedLogo } from "../data/logo";
 import { subjects } from "../data/subjects";
 import { teachers } from "../data/teachers";
-import { collaborator, founder, imageLibrary, institutionalCopy } from "../data/site";
+import { collaborator, founder, imageLibrary, institutionalCopy, siteMeta } from "../data/site";
 import { agency } from "../data/agency";
 
 const featuredSubjects = subjects.slice(0, 6);
@@ -19,8 +19,8 @@ const logoSrc = versionedLogo();
 ---
 
 <BaseLayout
-  title="ALMA — Escuela & Agencia de Imagen"
-  description="ALMA, escuela de modelaje y agencia de imagen con formación, equipo docente, agencia y proyecto empresarial."
+  title={siteMeta.defaultTitle}
+  description={siteMeta.defaultDescription}
   image={imageLibrary.hero}
   pageClass="home-page"
 >

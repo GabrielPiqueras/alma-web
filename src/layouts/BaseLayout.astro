@@ -4,6 +4,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { versionedImage } from "../data/imageVersions";
 import { contact, imageLibrary, siteMeta } from "../data/site";
+import { seoSettings, normalizePagePath, canonicalPageUrl, pageIsIndexable, serializeJsonLd } from "../data/seo";
 import "../styles/theme.css";
 import "../styles/global.css";
 
@@ -23,20 +24,33 @@ const {
   jsonLd = []
 } = Astro.props;
 
-const pageTitle = title.includes("ALMA") ? title : `${title} | ALMA`;
-const canonical = new URL(Astro.url.pathname, Astro.site ?? siteMeta.url).toString();
+const pagePath = normalizePagePath(Astro.url.pathname);
+const override = seoSettings.pages[pagePath];
+const pageTitle = override?.title || (title.includes(siteMeta.name) ? title : `${title} | ${siteMeta.name}`);
+const pageDescription = override?.description || description;
+const canonical = canonicalPageUrl(siteMeta.url, pagePath);
+const indexable = pageIsIndexable(seoSettings, pagePath);
 const metaImage = versionedImage(image);
-const imageUrl = metaImage.startsWith("http") ? metaImage : new URL(metaImage, siteMeta.url).toString();
+const imageUrl = metaImage.startsWith("https://") ? metaImage : siteMeta.url ? new URL(metaImage, siteMeta.url).toString() : "";
+const address = {
+  "@type": "PostalAddress",
+  ...(contact.streetAddress ? { streetAddress: contact.streetAddress } : {}),
+  ...(contact.city ? { addressLocality: contact.city } : {}),
+  ...(contact.region ? { addressRegion: contact.region } : {}),
+  ...(contact.postalCode ? { postalCode: contact.postalCode } : {}),
+  ...(contact.country ? { addressCountry: contact.country } : {})
+};
 const schema = [
   {
     "@context": "https://schema.org",
     "@type": ["Organization", "EducationalOrganization"],
-    name: siteMeta.defaultTitle,
-    url: siteMeta.url,
-    email: contact.email,
-    telephone: contact.phone,
-    description,
-    sameAs: [`https://www.instagram.com/${contact.instagram.replace("@", "")}`]
+    name: siteMeta.name,
+    description: siteMeta.defaultDescription,
+    ...(siteMeta.url ? { url: siteMeta.url } : {}),
+    ...(contact.email ? { email: contact.email } : {}),
+    ...(contact.phone ? { telephone: contact.phone } : {}),
+    ...(contact.instagram ? { sameAs: [`https://www.instagram.com/${contact.instagram.replace("@", "")}/`] } : {}),
+    ...(Object.keys(address).length > 1 ? { address } : {})
   },
   ...jsonLd
 ];
@@ -49,26 +63,28 @@ const schema = [
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <title>{pageTitle}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    <meta name="description" content={pageDescription} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta name="robots" content={indexable ? "index, follow" : "noindex, follow"} />
+    {seoSettings.googleSiteVerification && <meta name="google-site-verification" content={seoSettings.googleSiteVerification} />}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content={siteMeta.locale} />
     <meta property="og:title" content={pageTitle} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={imageUrl} />
+    <meta property="og:description" content={pageDescription} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {imageUrl && <meta property="og:image" content={imageUrl} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={imageUrl} />
+    <meta name="twitter:description" content={pageDescription} />
+    {imageUrl && <meta name="twitter:image" content={imageUrl} />}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    <script type="application/ld+json" set:html={serializeJsonLd(schema)} />
     <ViewTransitions fallback="swap" />
     <link rel="stylesheet" href="/theme-live.css" />
   </head>

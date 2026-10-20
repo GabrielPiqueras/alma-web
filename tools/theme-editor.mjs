@@ -6,9 +6,12 @@ import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import { syncImageVersions } from "./image-versions.mjs";
 import { saveLogoBuffer, syncLogoVersion } from "./logo-tools.mjs";
+import { createSeoStore } from "./seo-settings.mjs";
+import { seoStyles, seoMarkup } from "./seo-editor-ui.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = dirname(__dirname);
+const seoStore = createSeoStore(projectRoot);
 const themePath = join(projectRoot, "src", "styles", "theme.css");
 const liveThemePath = join(projectRoot, "public", "theme-live.css");
 const distLiveThemePath = join(projectRoot, "dist", "theme-live.css");
@@ -488,6 +491,7 @@ function renderHtml() {
     .logo-copy p { margin: 0; color: color-mix(in srgb, var(--ui-light) 68%, transparent); }
     @media (max-width: 880px) { .hero, .layout, .color-grid, .image-grid { grid-template-columns: 1fr; } .preview { position: static; } }
     @media (max-width: 880px) { .logo-panel { grid-template-columns: 1fr; } }
+    ${seoStyles}
   </style>
 </head>
 <body>
@@ -497,13 +501,14 @@ function renderHtml() {
         <p class="brand">ALMA / Editor visual</p>
         <h1>Ajustes del proyecto</h1>
       </div>
-      <p class="intro">Gestiona la paleta y las imágenes locales de ALMA desde una herramienta visual. Los cambios se escriben directamente en los archivos del proyecto.</p>
+      <p class="intro">Gestiona la paleta, las imágenes, el logo y el SEO de ALMA desde una herramienta visual. Los cambios se escriben directamente en los archivos del proyecto.</p>
     </section>
 
     <nav class="tabs" aria-label="Secciones del editor">
       <button class="tab-button is-active" type="button" data-tab="colors">Colores</button>
       <button class="tab-button" type="button" data-tab="images">Imágenes</button>
       <button class="tab-button" type="button" data-tab="logo">Logo</button>
+      <button class="tab-button" type="button" data-tab="seo">SEO y datos</button>
       <a class="link-button" href="http://127.0.0.1:4321/" target="_blank" rel="noreferrer">Abrir web</a>
     </nav>
 
@@ -583,7 +588,9 @@ function renderHtml() {
         </div>
       </div>
     </section>
+    ${seoMarkup}
   </main>
+  <script type="module" src="/seo-editor.js"></script>
 
   <script>
     const fields = ${JSON.stringify(editableColors)};
@@ -632,6 +639,7 @@ function renderHtml() {
       tabColors.hidden = tab !== 'colors';
       tabImages.hidden = tab !== 'images';
       tabLogo.hidden = tab !== 'logo';
+      document.querySelector('#tab-seo').hidden = tab !== 'seo';
       if (tab === 'images') loadImages().catch((error) => { imageStatus.textContent = error.message; });
       if (tab === 'logo') loadLogo().catch((error) => { logoStatus.textContent = error.message; });
     }
@@ -981,7 +989,27 @@ function renderHtml() {
 
 const server = createServer(async (request, response) => {
   try {
-    const url = new URL(request.url ?? "/", "http://localhost");
+    const host = request.headers.host;
+    const allowedHosts = [`127.0.0.1:${request.socket.localPort}`, `localhost:${request.socket.localPort}`];
+    if (!allowedHosts.includes(host) || (request.headers.origin && request.headers.origin !== `http://${host}`)) {
+      return sendJson(response, 403, { error: "Abre el editor desde su dirección local." });
+    }
+    const url = new URL(request.url ?? "/", `http://${host}`);
+    if (seoStore.busy && request.method === "POST") return sendJson(response, 409, { error: "Espera a que termine la generación de la web." });
+    if (request.method === "GET" && url.pathname === "/seo-editor.js") {
+      response.writeHead(200, { "Content-Type": "text/javascript; charset=utf-8", "Cache-Control": "no-store" });
+      return response.end(await readFile(join(__dirname, "seo-editor-client.mjs"), "utf8"));
+    }
+    if (request.method === "GET" && url.pathname === "/api/seo") return sendJson(response, 200, await seoStore.state());
+    if (request.method === "POST" && ["/api/seo/apply", "/api/seo/restore"].includes(url.pathname)) {
+      if (!request.headers["content-type"]?.startsWith("application/json")) return sendJson(response, 415, { error: "Se esperaba una configuración JSON." });
+      try {
+        const data = JSON.parse((await readRequestBody(request, 1024 * 512)).toString("utf8"));
+        return sendJson(response, 200, await seoStore.apply(data.settings, data.revision, url.pathname.endsWith("/restore")));
+      } catch (error) {
+        return sendJson(response, error.statusCode || 400, { error: error.message, saved: Boolean(error.saved), applied: false });
+      }
+    }
     if (request.method === "GET" && url.pathname.startsWith(`${imageRouteBase}/`)) {
       const fileName = decodeURIComponent(url.pathname.slice(`${imageRouteBase}/`.length));
       return sendImageAsset(response, fileName);
@@ -1096,7 +1124,7 @@ function listen(port) {
     console.log(`Archivo: ${themePath}`);
     console.log(`Editor:  ${url}`);
     console.log("Cierra esta ventana para apagar el editor.");
-    openBrowser(url);
+    if (!process.argv.includes("--no-open")) openBrowser(url);
   });
   server.listen(port, "127.0.0.1");
 }
